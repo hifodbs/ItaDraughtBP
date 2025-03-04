@@ -18,6 +18,7 @@ with some rules:
 When a pawn reach the end of the chessboard it is promoted to king, the king can move like a pawn 
 plus it can go and capture backwards. A pawn can't capture a king, but a king can capture a pawn.
 
+test
 
 FURTHER IMPROVEMENT:
 -GUI
