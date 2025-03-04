@@ -1,6 +1,6 @@
 The project is about develop a digital version of italian draught. The draught is composed by 
 chessboard and pawns. The objective is capture all the enemy pawns. Every player start with
-twelve pawns set and the game is played on the black squares. Each player start with its own pawns 
+twelve pawns and the game is played on the black squares. Each player start with its own pawns 
 on three rows at the bottom of the chessboard from its own point of view. A player in his turn can 
 use only one own piece, and he can choose to move the piece or capture an enemy piece.
 The pawns can only move diagonally forward by one square, if the square is occupied by an enemy
@@ -9,7 +9,6 @@ through the enemy piece.
 It's possible only if the square behind the enemy piece is free. It's possible to capture
 more than one enemy piece in one capture. In the italian draught the action of capturing is forced
 with some rules:
-    If a player is faced with the prospect of choosing which captures to make, the first and foremost rule to obey is to capture the greatest quantity of pieces.
     If a player may capture an equal number of pieces with either a man or king, he must do so with the king.
     If a player may capture an equal number of pieces with a king, in which one or more options contain a number of kings, he must capture the greatest number of kings possible.
     If a player may capture an equal number of pieces (each series containing a king) with a king, he must capture wherever the king occurs first.
@@ -18,7 +17,7 @@ with some rules:
 When a pawn reach the end of the chessboard it is promoted to king, the king can move like a pawn 
 plus it can go and capture backwards. A pawn can't capture a king, but a king can capture a pawn.
 
-Use Case:
+1) Identify Use Cases
 
 UC 1 Play a game
 Actor: Player
@@ -28,6 +27,14 @@ Actor: Player
 	Domain objects:
 		- Chessboard
 		- Pawn and King
+
+2) Identify Classes:
+	- Game
+	- Pieces (Pawn and King)
+	- Chessboard
+	
+3) Identify Relationships:
+	- A Game is composed by a chessboard and moving pieces
 
 FURTHER IMPROVEMENT:
 -GUI
