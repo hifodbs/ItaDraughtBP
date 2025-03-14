@@ -6,7 +6,7 @@ public class AcceptanceGameTest {
 
     @Test
     void testWhiteWin(){
-        //TODO
+        //TODOo
         //startGame();
     }
 
