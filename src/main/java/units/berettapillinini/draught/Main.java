@@ -1,4 +1,4 @@
-package org.example;
+package units.berettapillinini.draught;
 
 public class Main {
     public static void main(String[] args) {

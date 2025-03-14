@@ -6,6 +6,7 @@ plugins {
 group = "org.example"
 version = "1.0-SNAPSHOT"
 
+
 repositories {
     mavenCentral()
 }
@@ -16,7 +17,13 @@ dependencies {
 }
 
 application {
-    mainClass = "Main"
+    mainClass = "units.berettapillinini.draught/Main"
+}
+
+tasks.jar {
+    manifest {
+        attributes["Main-Class"] = "units.berettapillinini.draught.Main"
+    }
 }
 
 tasks.test {
