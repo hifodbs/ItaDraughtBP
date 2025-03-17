@@ -1,7 +1,7 @@
 The project is about develop a digital version of italian draught. The draught is composed by 
 chessboard and pawns. The objective is capture all the enemy pawns. Every player start with
 twelve pawns and the game is played on the black squares. Each player start with its own pawns 
-on three rows at the bottom of the chessboard from its own point of view. A player in his turn can 
+on three rows at the bottom of the chessboard from its own point of draughtView. A player in his turn can
 use only one own piece, and he can choose to move the piece or capture an enemy piece.
 The pawns can only move diagonally forward by one square, if the square is occupied by an enemy
 piece it's possible to capture the enemy piece by jumping other it, thus moving by two square 
