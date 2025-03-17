@@ -38,12 +38,12 @@ public class DraughtAcceptanceTest {
     }
 
     private DraughtAcceptanceTest blackTurn(String move) {
-        game.moveBlackPiece(move);
+        game.movePiece(move,"black");
         return this;
     }
 
     private DraughtAcceptanceTest whiteTurn(String move) {
-        game.moveWhitePiece(move);
+        game.movePiece(move,"white");
         return this;
     }
 

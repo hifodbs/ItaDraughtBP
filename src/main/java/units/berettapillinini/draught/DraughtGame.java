@@ -1,6 +1,7 @@
 package units.berettapillinini.draught;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 
 public class DraughtGame {
 
@@ -27,7 +28,7 @@ public class DraughtGame {
         return chessboard;
     }
 
-    public void moveWhitePiece(String move) {
+    public void movePiece(String move, String player) {
         int old_y = Integer.parseInt(move.split(";")[0].split(",")[0]);
         int old_x = Integer.parseInt(move.split(";")[0].split(",")[1]);
         int new_y = Integer.parseInt(move.split(";")[1].split(",")[0]);
@@ -44,25 +45,26 @@ public class DraughtGame {
         }
 
         draughtView.on_chessboard_update(chessboard.getGrid());
-        boolean game_end = checkGameEnd();
-        String m =  (game_end) ? "White win" : "Black turn";
+        boolean game_end = checkGameEnd(player);
+        String m;
+        if(player.equals("white"))
+            m = (game_end) ? "White win" : "Black turn";
+        else
+            m = (game_end) ? "Black win" : "White turn";
         draughtView.on_next_turn(m);
     }
 
-    private boolean checkGameEnd() {
+    private boolean checkGameEnd(String player) {
+        EnumSet<PIECE> set;
+        if(player.equals("white"))
+            set = EnumSet.of(PIECE.BLACK_KING,PIECE.BLACK_PAWN);
+        else
+            set = EnumSet.of(PIECE.WHITE_KING,PIECE.WHITE_PAWN);
+
         PIECE[][] grid = chessboard.getGrid();
+
         return Arrays.stream(grid).flatMap(Arrays::stream)
-                .noneMatch(p -> p == PIECE.BLACK_PAWN || p == PIECE.BLACK_KING);
+                .noneMatch(set::contains);
     }
 
-    public void moveBlackPiece(String move) {
-        int old_y = Integer.parseInt(move.split(";")[0].split(",")[0]);
-        int old_x = Integer.parseInt(move.split(";")[0].split(",")[1]);
-        int new_y = Integer.parseInt(move.split(";")[1].split(",")[0]);
-        int new_x = Integer.parseInt(move.split(";")[1].split(",")[1]);
-        chessboard.setSquare(new_y,new_x,chessboard.getCell(old_y,old_x));
-        chessboard.setSquare(old_y,old_x,PIECE.EMPTY);
-        draughtView.on_chessboard_update(chessboard.getGrid());
-        draughtView.on_next_turn("White turn");
-    }
 }
