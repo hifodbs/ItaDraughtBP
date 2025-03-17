@@ -21,7 +21,7 @@ public class DraughtAcceptanceTest {
     @Test
     void testWhiteWin(){
         //TODO
-        startGame().verifyBeginChessboard().verifyMessage("White turn");
+        startGame().verifyBeginChessboard().verifyMessage("Black turn");
         setChessboard(whiteWinThreeTurns);
         view.on_chessboard_update(game.getChessboard().getGrid());
     }
@@ -59,7 +59,6 @@ public class DraughtAcceptanceTest {
 
     private static class FakeView implements DraughtView{
 
-        boolean shown = false;
         PIECE[][] grid;
         String message;
 
