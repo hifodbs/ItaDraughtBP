@@ -19,34 +19,40 @@ public class DraughtAcceptanceTest {
     String whiteWinThreeTurns = "2,6,BP;5,3,WP";
 
     @Test
-    void testWhiteWin(){
-        //TODO
-        startGame().verifyBeginChessboard().verifyMessage("Black turn");
-        setChessboard(whiteWinThreeTurns);
-        view.on_chessboard_update(game.getChessboard().getGrid());
+    void personalTest(){
+        String str = "";
+        String[] sub_str = str.split(";",0);
+        for(String s : sub_str)
+            System.out.println("Daje");
     }
 
-    private void setChessboard(String setup) {
-        Chessboard chessboard = game.getChessboard();
-        int size = chessboard.getGridSize();
-        String[] allPosition = setup.split(";");
-        for(int a = 0; a < size; a++)
-            for(int b = 0; b < size; b++) {
-                chessboard.setSquare(a,b, PIECE.EMPTY);
-                for(String position : allPosition){
-                    String[] positionSetup = position.split(",");
-                    if(a==Integer.parseInt(positionSetup[0]) && b==Integer.parseInt(positionSetup[1]))
-                        chessboard.setSquare(a,b, PIECE.getPiece(positionSetup[2]));
-                }
-            }
+    @Test
+    void testWhiteWin(){
+        //TODO
+        startGame().verifyChessboard(new Chessboard().getGrid()).verifyMessage("White turn");
+        game.getChessboard().setGrid(createGrid(whiteWinThreeTurns));
+        whiteTurn("5,3;4,4").verifyChessboard(createGrid("2,6,BP;4,4,WP")).verifyMessage("Black turn");
+        blackTurn("2,6;3,5").verifyChessboard(createGrid("3,5,BP;4,4,WP")).verifyMessage("White turn");
+        whiteTurn("4,4;2,6").verifyChessboard(createGrid("2,6,WP")).verifyMessage("White win");
+
+    }
+
+    private DraughtAcceptanceTest blackTurn(String move) {
+        game.moveBlackPiece(move);
+        return this;
+    }
+
+    private DraughtAcceptanceTest whiteTurn(String move) {
+        game.moveWhitePiece(move);
+        return this;
     }
 
     private void verifyMessage(String m) {
         assertEquals(view.message,m,"Il messaggio deve essere : "+m);
     }
 
-    private DraughtAcceptanceTest verifyBeginChessboard() {
-        assertEquals(Arrays.deepToString(view.grid), Arrays.deepToString(new Chessboard().getGrid()),"La griglia deve essre vuota");
+    private DraughtAcceptanceTest verifyChessboard(PIECE[][] setup) {
+        assertEquals(Arrays.deepToString(view.grid), Arrays.deepToString(setup),"La griglia non è come dovrebbe essere");
         return this;
     }
 
@@ -55,6 +61,25 @@ public class DraughtAcceptanceTest {
         game = new DraughtGame(view,"p1","p2");
         game.start();
         return this;
+    }
+
+    public PIECE[][] createGrid(String setup){
+        Chessboard chessboard = new Chessboard();
+        int size = chessboard.getGridSize();
+        boolean skip = setup.isEmpty();
+
+        String[] allPosition = setup.split(";");
+        for(int a = 0; a < size; a++)
+            for(int b = 0; b < size; b++) {
+                chessboard.setSquare(a,b, PIECE.EMPTY);
+                if(!skip)
+                    for(String position : allPosition){
+                        String[] positionSetup = position.split(",");
+                        if(a==Integer.parseInt(positionSetup[0]) && b==Integer.parseInt(positionSetup[1]))
+                            chessboard.setSquare(a,b, PIECE.getPiece(positionSetup[2]));
+                    }
+            }
+        return chessboard.getGrid();
     }
 
     private static class FakeView implements DraughtView{
@@ -66,7 +91,8 @@ public class DraughtAcceptanceTest {
         public void on_chessboard_update(PIECE[][] grid) {
             this.grid = grid;
             int size = 8;
-            int a = 0;
+            int a;
+            System.out.println("-----------------inizio scacchiera----------------");
             for(int c = 0; c < size*2; c++) {
                 a = (c-c%2)/2;
                 for (int b = 0; b < size; b++) {
@@ -95,6 +121,8 @@ public class DraughtAcceptanceTest {
                 }
                 System.out.println();
             }
+
+            System.out.println("--------------------fine scacchiera----------------");
         }
 
         @Override
