@@ -11,4 +11,9 @@ public class DraughtConsole implements DraughtView {
     public void on_next_turn(String m) {
 
     }
+
+    @Override
+    public void on_close() {
+
+    }
 }
