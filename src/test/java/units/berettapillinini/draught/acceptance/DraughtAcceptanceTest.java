@@ -86,6 +86,7 @@ public class DraughtAcceptanceTest {
 
         PIECE[][] grid;
         String message;
+        boolean close = false;
 
         @Override
         public void on_chessboard_update(PIECE[][] grid) {
@@ -128,6 +129,11 @@ public class DraughtAcceptanceTest {
         @Override
         public void on_next_turn(String m) {
             message = m;
+        }
+
+        @Override
+        public  void on_close(){
+            close = true;
         }
     }
 

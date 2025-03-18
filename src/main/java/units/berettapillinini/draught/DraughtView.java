@@ -6,6 +6,6 @@ public interface DraughtView {
 
     void on_next_turn(String m);
 
-
+    void on_close();
 
 }
