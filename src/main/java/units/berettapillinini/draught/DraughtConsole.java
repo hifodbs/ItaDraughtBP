@@ -1,5 +1,7 @@
 package units.berettapillinini.draught;
 
+import units.berettapillinini.draught.bean.PIECE;
+
 public class DraughtConsole implements DraughtView {
 
     @Override

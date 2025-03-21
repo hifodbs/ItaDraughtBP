@@ -1,6 +1,9 @@
 package units.berettapillinini.draught;
 
 
+import units.berettapillinini.draught.bean.PIECE;
+import units.berettapillinini.draught.bean.Position;
+
 public class Chessboard {
 
     private final int SIZE_GRID = 8;
@@ -31,15 +34,15 @@ public class Chessboard {
         return SIZE_GRID;
     }
 
-    public void setSquare(int y, int x, PIECE p){
-        gridSquare[y][x] = p;
+    public void setSquare(Position p, PIECE piece){
+        gridSquare[p.getY()][p.getX()] = piece;
     }
 
     public void setGrid(PIECE[][] grid) {
         this.gridSquare = grid;
     }
 
-    public PIECE getCell(int y, int x) {
-        return gridSquare[y][x];
+    public PIECE getCell(Position p) {
+        return gridSquare[p.getY()][p.getX()];
     }
 }

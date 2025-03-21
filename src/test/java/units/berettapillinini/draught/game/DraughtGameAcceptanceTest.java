@@ -1,17 +1,19 @@
-package units.berettapillinini.draught.acceptance;
+package units.berettapillinini.draught.game;
 
 import org.junit.jupiter.api.Test;
 import units.berettapillinini.draught.Chessboard;
 import units.berettapillinini.draught.DraughtGame;
 import units.berettapillinini.draught.DraughtView;
-import units.berettapillinini.draught.PIECE;
+import units.berettapillinini.draught.bean.COLOR;
+import units.berettapillinini.draught.bean.PIECE;
+import units.berettapillinini.draught.bean.Position;
 
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 
-public class DraughtAcceptanceTest {
+public class DraughtGameAcceptanceTest {
 
     private FakeView view;
     private DraughtGame game;
@@ -37,26 +39,26 @@ public class DraughtAcceptanceTest {
 
     }
 
-    private DraughtAcceptanceTest blackTurn(String move) {
-        game.movePiece(move,"black");
+    private DraughtGameAcceptanceTest blackTurn(String move) {
+        game.movePiece(move, COLOR.BLACK);
         return this;
     }
 
-    private DraughtAcceptanceTest whiteTurn(String move) {
-        game.movePiece(move,"white");
+    private DraughtGameAcceptanceTest whiteTurn(String move) {
+        game.movePiece(move,COLOR.WHITE);
         return this;
     }
 
     private void verifyMessage(String m) {
-        assertEquals(view.message,m,"Il messaggio deve essere : "+m);
+        assertEquals(m,view.message,"Il messaggio deve essere : "+m);
     }
 
-    private DraughtAcceptanceTest verifyChessboard(PIECE[][] setup) {
-        assertEquals(Arrays.deepToString(view.grid), Arrays.deepToString(setup),"La griglia non è come dovrebbe essere");
+    private DraughtGameAcceptanceTest verifyChessboard(PIECE[][] setup) {
+        assertEquals(Arrays.deepToString(setup),Arrays.deepToString(view.grid) ,"La griglia non è come dovrebbe essere");
         return this;
     }
 
-    private DraughtAcceptanceTest startGame() {
+    private DraughtGameAcceptanceTest startGame() {
         view = new FakeView();
         game = new DraughtGame(view,"p1","p2");
         game.start();
@@ -67,16 +69,17 @@ public class DraughtAcceptanceTest {
         Chessboard chessboard = new Chessboard();
         int size = chessboard.getGridSize();
         boolean skip = setup.isEmpty();
-
+        Position p = new Position(0,0);
         String[] allPosition = setup.split(";");
         for(int a = 0; a < size; a++)
             for(int b = 0; b < size; b++) {
-                chessboard.setSquare(a,b, PIECE.EMPTY);
+                p.setPosition(b,a);
+                chessboard.setSquare(p, PIECE.EMPTY);
                 if(!skip)
                     for(String position : allPosition){
                         String[] positionSetup = position.split(",");
                         if(a==Integer.parseInt(positionSetup[0]) && b==Integer.parseInt(positionSetup[1]))
-                            chessboard.setSquare(a,b, PIECE.getPiece(positionSetup[2]));
+                            chessboard.setSquare(p, PIECE.getPiece(positionSetup[2]));
                     }
             }
         return chessboard.getGrid();
@@ -91,7 +94,7 @@ public class DraughtAcceptanceTest {
         @Override
         public void on_chessboard_update(PIECE[][] grid) {
             this.grid = grid;
-            int size = 8;
+            /*int size = 8;
             int a;
             System.out.println("-----------------inizio scacchiera----------------");
             for(int c = 0; c < size*2; c++) {
@@ -123,7 +126,7 @@ public class DraughtAcceptanceTest {
                 System.out.println();
             }
 
-            System.out.println("--------------------fine scacchiera----------------");
+            System.out.println("--------------------fine scacchiera----------------");*/
         }
 
         @Override
