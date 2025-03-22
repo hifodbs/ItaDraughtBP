@@ -7,10 +7,13 @@ import units.berettapillinini.draught.DraughtView;
 import units.berettapillinini.draught.bean.COLOR;
 import units.berettapillinini.draught.bean.PIECE;
 import units.berettapillinini.draught.bean.Position;
+import units.berettapillinini.draught.game.util.FakeView;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static units.berettapillinini.draught.game.util.TestUtil.createGrid;
 
 
 public class DraughtGameAcceptanceTest {
@@ -18,14 +21,13 @@ public class DraughtGameAcceptanceTest {
     private FakeView view;
     private DraughtGame game;
 
-    String whiteWinThreeTurns = "2,6,BP;5,3,WP";
+    String whiteWinThreeTurns = "6,2,BP;3,5,WP";
 
     @Test
     void personalTest(){
-        String str = "";
-        String[] sub_str = str.split(";",0);
-        for(String s : sub_str)
-            System.out.println("Daje");
+        ArrayList<Integer> list = new ArrayList<>();
+        System.out.println(list.size());
+        list.add(1);
     }
 
     @Test
@@ -33,9 +35,9 @@ public class DraughtGameAcceptanceTest {
         //TODO
         startGame().verifyChessboard(new Chessboard().getGrid()).verifyMessage("White turn");
         game.getChessboard().setGrid(createGrid(whiteWinThreeTurns));
-        whiteTurn("5,3;4,4").verifyChessboard(createGrid("2,6,BP;4,4,WP")).verifyMessage("Black turn");
-        blackTurn("2,6;3,5").verifyChessboard(createGrid("3,5,BP;4,4,WP")).verifyMessage("White turn");
-        whiteTurn("4,4;2,6").verifyChessboard(createGrid("2,6,WP")).verifyMessage("White win");
+        whiteTurn("3,5;4,4").verifyMessage("Black turn").verifyChessboard(createGrid("6,2,BP;4,4,WP"));
+        blackTurn("6,2;5,3").verifyMessage("White turn").verifyChessboard(createGrid("5,3,BP;4,4,WP"));
+        whiteTurn("4,4;6,2").verifyMessage("White win").verifyChessboard(createGrid("6,2,WP"));
 
     }
 
@@ -49,8 +51,9 @@ public class DraughtGameAcceptanceTest {
         return this;
     }
 
-    private void verifyMessage(String m) {
+    private DraughtGameAcceptanceTest verifyMessage(String m) {
         assertEquals(m,view.message,"Il messaggio deve essere : "+m);
+        return this;
     }
 
     private DraughtGameAcceptanceTest verifyChessboard(PIECE[][] setup) {
@@ -65,79 +68,5 @@ public class DraughtGameAcceptanceTest {
         return this;
     }
 
-    public PIECE[][] createGrid(String setup){
-        Chessboard chessboard = new Chessboard();
-        int size = chessboard.getGridSize();
-        boolean skip = setup.isEmpty();
-        Position p = new Position(0,0);
-        String[] allPosition = setup.split(";");
-        for(int a = 0; a < size; a++)
-            for(int b = 0; b < size; b++) {
-                p.setPosition(b,a);
-                chessboard.setSquare(p, PIECE.EMPTY);
-                if(!skip)
-                    for(String position : allPosition){
-                        String[] positionSetup = position.split(",");
-                        if(a==Integer.parseInt(positionSetup[0]) && b==Integer.parseInt(positionSetup[1]))
-                            chessboard.setSquare(p, PIECE.getPiece(positionSetup[2]));
-                    }
-            }
-        return chessboard.getGrid();
-    }
-
-    private static class FakeView implements DraughtView{
-
-        PIECE[][] grid;
-        String message;
-        boolean close = false;
-
-        @Override
-        public void on_chessboard_update(PIECE[][] grid) {
-            this.grid = grid;
-            /*int size = 8;
-            int a;
-            System.out.println("-----------------inizio scacchiera----------------");
-            for(int c = 0; c < size*2; c++) {
-                a = (c-c%2)/2;
-                for (int b = 0; b < size; b++) {
-                    if(c%2==0) {
-                        System.out.print("---");
-                    }
-                    else {
-                        System.out.print("|");
-                        switch (grid[a][b]) {
-                            case WHITE_PAWN:
-                                System.out.print("WP");
-                                break;
-                            case WHITE_KING:
-                                System.out.print("WK");
-                                break;
-                            case BLACK_PAWN:
-                                System.out.print("BP");
-                                break;
-                            case BLACK_KING:
-                                System.out.print("BK");
-                                break;
-                            default:
-                                System.out.print("  ");
-                        }
-                    }
-                }
-                System.out.println();
-            }
-
-            System.out.println("--------------------fine scacchiera----------------");*/
-        }
-
-        @Override
-        public void on_next_turn(String m) {
-            message = m;
-        }
-
-        @Override
-        public  void on_close(){
-            close = true;
-        }
-    }
 
 }

@@ -8,6 +8,11 @@ import units.berettapillinini.draught.bean.Position;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toSet;
 
 public class DraughtGame {
 
@@ -35,45 +40,42 @@ public class DraughtGame {
     }
 
     public void movePiece(String move, COLOR player) {
-        int old_y = Integer.parseInt(move.split(";")[0].split(",")[0]);
-        int old_x = Integer.parseInt(move.split(";")[0].split(",")[1]);
-        Position old_p = new Position(old_x,old_y);
-        int new_y = Integer.parseInt(move.split(";")[1].split(",")[0]);
-        int new_x = Integer.parseInt(move.split(";")[1].split(",")[1]);
-        Position new_p = new Position(new_x,new_y);
+        ArrayList<Position> positionOfPiece = new ArrayList<>();
+        Arrays.stream(move.split(";")).forEach(str->positionOfPiece
+                .add(new Position(Integer.parseInt(str.split(",")[0]),Integer.parseInt(str.split(",")[1]))));
 
-        PIECE oldCell = chessboard.getCell(old_p);
+        PIECE oldCell = chessboard.getCell(positionOfPiece.get(0));
 
         if(oldCell == PIECE.EMPTY) {
             draughtView.on_next_turn("No existing piece");
             return;
         }
 
-        if(player == COLOR.WHITE && oldCell.getColor() == COLOR.BLACK){
+        if(player != oldCell.getColor()){
             draughtView.on_next_turn("Can't move opponent piece");
             return;
         }
 
-        if(player == COLOR.BLACK && oldCell.getColor() == COLOR.WHITE){
-            draughtView.on_next_turn("Can't move opponent piece");
-            return;
+        ArrayList<ArrayList<Position>> possiblePaths = new ArrayList<>();
+        checkPossiblePath(possiblePaths,oldCell, positionOfPiece.get(0),getCatchablePiece(oldCell));
+
+
+        ArrayList<Position> path = null;
+        for(ArrayList<Position> possiblePath : possiblePaths){
+            if(possiblePath.containsAll(positionOfPiece)){
+                path = possiblePath;
+            }
         }
 
-        if( oldCell.getMoveList().stream().noneMatch(p -> Position.add(p,old_p).equals(new_p))){
+        if(path == null){
             draughtView.on_next_turn("Can't move here");
             return;
         }
 
-
-
-        if (Math.abs(old_y-new_y)==2 && Math.abs(old_x-new_x)==2) {
-            chessboard.setSquare(new_p, oldCell);
-            chessboard.setSquare(old_p, PIECE.EMPTY);
-            chessboard.setSquare(new Position(old_x-Integer.signum(old_x-new_x),old_y-Integer.signum(old_y-new_y)), PIECE.EMPTY);
-        }
-        else {
-            chessboard.setSquare(new_p, oldCell);
-            chessboard.setSquare(old_p, PIECE.EMPTY);
+        chessboard.setSquare(path.get(path.size()-1),chessboard.getCell(path.get(0)));
+        path.remove(path.size()-1);
+        for(Position p : path){
+            chessboard.setSquare(p,PIECE.EMPTY);
         }
 
         draughtView.on_chessboard_update(chessboard.getGrid());
@@ -84,6 +86,36 @@ public class DraughtGame {
         else
             m = (game_end) ? "Black win" : "White turn";
         draughtView.on_next_turn(m);
+    }
+
+    public EnumSet<PIECE> getCatchablePiece(PIECE oldCell) {
+        return EnumSet.allOf(PIECE.class).stream().filter(piece -> piece.getColor()!=oldCell.getColor() && piece!=PIECE.EMPTY)
+                .filter(piece -> (oldCell.getGrade()== GRADE.PAWN && piece.getGrade()==GRADE.PAWN) || oldCell.getGrade() == GRADE.KING)
+                .collect(collectingAndThen(toSet(), EnumSet::copyOf));
+    }
+
+    private void checkPossiblePath(ArrayList<ArrayList<Position>> possiblePath, PIECE oldCell, Position old_p, EnumSet<PIECE> catchablePieces) {
+        Set<Position> possiblePosition = oldCell.getMoveList().stream()
+                .filter(move -> catchablePieces.contains(chessboard.getCell(Position.add(move,old_p)))
+                && chessboard.getCell(Position.add(move,Position.add(move,old_p))) == PIECE.EMPTY).collect(Collectors.toSet());
+
+        if(!possiblePosition.isEmpty()){
+            for(Position pp : possiblePosition){
+                possiblePath.add(new ArrayList<>());
+                possiblePath.get(possiblePath.size()-1).add(old_p);
+                possiblePath.get(possiblePath.size()-1).add(Position.add(pp,old_p));
+                possiblePath.get(possiblePath.size()-1).add(Position.add(old_p,Position.add(pp,pp)));
+            }
+            return;
+        }
+        possiblePosition =  oldCell.getMoveList().stream().filter(move->chessboard.getCell(Position.add(move,old_p))==PIECE.EMPTY)
+                .collect(Collectors.toSet());
+        for(Position pp: possiblePosition)
+        {
+            possiblePath.add(new ArrayList<>());
+            possiblePath.get(possiblePath.size()-1).add(old_p);
+            possiblePath.get(possiblePath.size()-1).add(Position.add(pp,old_p));
+        }
     }
 
     private boolean checkGameEnd(COLOR player) {

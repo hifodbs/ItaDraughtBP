@@ -30,4 +30,16 @@ public class Position{
     public static Position add(Position p1, Position p2){
         return new Position(p1.getX()+ p2.getX(), p1.getY()+ p2.getY());
     }
+
+    @Override
+    public String toString() {
+        return "("+x+","+y+")";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(! (obj instanceof Position))
+            return false;
+        return obj.toString().equals(this.toString());
+    }
 }
