@@ -1,15 +1,11 @@
 package units.berettapillinini.draught.game;
 
 import org.junit.jupiter.api.Test;
-import units.berettapillinini.draught.Chessboard;
 import units.berettapillinini.draught.DraughtGame;
-import units.berettapillinini.draught.DraughtView;
 import units.berettapillinini.draught.bean.COLOR;
-import units.berettapillinini.draught.bean.PIECE;
-import units.berettapillinini.draught.bean.Position;
 import units.berettapillinini.draught.game.util.FakeView;
 
-import java.util.EnumSet;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static units.berettapillinini.draught.game.util.TestUtil.createGrid;
@@ -18,12 +14,18 @@ public class DraughtGameTest {
 
     FakeView view = new FakeView();
 
-    String whiteMakeTwoMoves = "3,5,WP;0,0,BP";
+    String firstScenario = "3,5,WP;0,0,BP";
+    String secondScenario = "4,4,WP;5,3,BP;0,0,BP";
+    String thirdScenario = "4,4,WP;5,3,BK;0,0,BP";
+    String fourthScenario = "3,5,WP;2,4,BP;2,2,BP";
+    String fifthScenario = "1,7,WP;2,6,BP;2,4,BP;4,4,BP;2,2,BP;4,2,BP";
+    String sixthScenario =  "1,1,WP;3,1,BP";
 
     @Test
     void testMoveNonExistingPiece(){
         DraughtGame draughtGame = new DraughtGame(view,"p1","p2");
-        draughtGame.getChessboard().setGrid(createGrid(whiteMakeTwoMoves));
+        draughtGame.start();
+        draughtGame.getChessboard().setGrid(createGrid(firstScenario));
         draughtGame.movePiece("7,7;6,6",COLOR.WHITE);
         assertEquals("No existing piece",view.message);
     }
@@ -31,7 +33,8 @@ public class DraughtGameTest {
     @Test
     void testMoveOpponentPiece(){
         DraughtGame draughtGame = new DraughtGame(view,"p1","p2");
-        draughtGame.getChessboard().setGrid(createGrid(whiteMakeTwoMoves));
+        draughtGame.start();
+        draughtGame.getChessboard().setGrid(createGrid(firstScenario));
         draughtGame.movePiece("0,0;1,1", COLOR.WHITE);
         assertEquals("Can't move opponent piece",view.message);
     }
@@ -39,16 +42,77 @@ public class DraughtGameTest {
     @Test
     void testAnomalousMove(){
         DraughtGame draughtGame = new DraughtGame(view,"p1","p2");
-        draughtGame.getChessboard().setGrid(createGrid(whiteMakeTwoMoves));
+        draughtGame.start();
+        draughtGame.getChessboard().setGrid(createGrid(firstScenario));
         draughtGame.movePiece("3,5;3,4",COLOR.WHITE);
+        assertEquals("Can't move here",view.message);
+    }
+
+    @Test
+    void testAvoidCapture(){
+        DraughtGame draughtGame = new DraughtGame(view,"p1","p2");
+        draughtGame.start();
+        draughtGame.getChessboard().setGrid(createGrid(secondScenario));
+        draughtGame.movePiece("4,4;3,3",COLOR.WHITE);
+        assertEquals("Can't move here",view.message);
+    }
+
+    @Test
+    void testCapturingKingWithPawn(){
+        DraughtGame draughtGame = new DraughtGame(view,"p1","p2");
+        draughtGame.start();
+        draughtGame.getChessboard().setGrid(createGrid(thirdScenario));
+        draughtGame.movePiece("4,4;6,2",COLOR.WHITE);
+        assertEquals("Can't move here",view.message);
+    }
+
+    @Test
+    void testGoingOutOfBound(){
+        DraughtGame draughtGame = new DraughtGame(view,"p1","p2");
+        draughtGame.start();
+        draughtGame.getChessboard().setGrid(createGrid(secondScenario));
+        draughtGame.movePiece("4,4;6,2",COLOR.WHITE);
+        assertEquals("Black turn",view.message);
+        draughtGame.movePiece("0,0;-1,1",COLOR.BLACK);
         assertEquals("Can't move here",view.message);
     }
 
     @Test
     void testWhiteMakeDoubleMoves(){
         DraughtGame draughtGame = new DraughtGame(view,"p1","p2");
-        draughtGame.getChessboard().setGrid(createGrid(whiteMakeTwoMoves));
-        //TODO
+        draughtGame.start();
+        draughtGame.getChessboard().setGrid(createGrid(firstScenario));
+        draughtGame.movePiece("3,5;2,4",COLOR.WHITE);
+        assertEquals("Black turn",view.message);
+        draughtGame.movePiece("2,4;3,3",COLOR.WHITE);
+        assertEquals("ERROR: It's black turn",view.message);
+    }
+    @Test
+    void testCapturingTwoPieces(){
+        DraughtGame draughtGame = new DraughtGame(view,"p1","p2");
+        draughtGame.start();
+        draughtGame.getChessboard().setGrid(createGrid(fourthScenario));
+        draughtGame.movePiece("3,5;1,3;3,1",COLOR.WHITE);
+        assertEquals("White win",view.message);
+    }
+
+    @Test
+    void testCapturingTwoPiecesInsteadOfThree(){
+        DraughtGame draughtGame = new DraughtGame(view,"p1","p2");
+        draughtGame.start();
+        draughtGame.getChessboard().setGrid(createGrid(fifthScenario));
+        draughtGame.movePiece("1,7;3,5;5,3",COLOR.WHITE);
+        assertEquals("Can't move here",view.message);
+    }
+
+    @Test
+    void testPromotingPiece(){
+        DraughtGame draughtGame = new DraughtGame(view,"p1","p2");
+        draughtGame.start();
+        draughtGame.getChessboard().setGrid(createGrid(sixthScenario));
+        draughtGame.movePiece("1,1;2,0",COLOR.WHITE);
+        assertEquals("Black turn",view.message);
+        assertEquals(Arrays.deepToString(createGrid("2,0,WK;3,1,BP")),Arrays.deepToString(view.grid) ,"La griglia non è come dovrebbe essere");
     }
 
 }

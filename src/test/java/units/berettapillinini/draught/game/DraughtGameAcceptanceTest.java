@@ -3,10 +3,8 @@ package units.berettapillinini.draught.game;
 import org.junit.jupiter.api.Test;
 import units.berettapillinini.draught.Chessboard;
 import units.berettapillinini.draught.DraughtGame;
-import units.berettapillinini.draught.DraughtView;
 import units.berettapillinini.draught.bean.COLOR;
 import units.berettapillinini.draught.bean.PIECE;
-import units.berettapillinini.draught.bean.Position;
 import units.berettapillinini.draught.game.util.FakeView;
 
 import java.util.ArrayList;
