@@ -9,6 +9,7 @@ through the enemy piece.
 It's possible only if the square behind the enemy piece is free. It's possible to capture
 more than one enemy piece in one capture. In the italian draught the action of capturing is forced
 with some rules:
+    If a player is faced with the prospect of choosing which captures to make, the first and foremost rule to obey is to capture the greatest quantity of pieces.
     If a player may capture an equal number of pieces with either a man or king, he must do so with the king.
     If a player may capture an equal number of pieces with a king, in which one or more options contain a number of kings, he must capture the greatest number of kings possible.
     If a player may capture an equal number of pieces (each series containing a king) with a king, he must capture wherever the king occurs first.

@@ -1,32 +1,36 @@
 package units.berettapillinini.draught.bean;
 
-import java.util.ArrayList;
+import units.berettapillinini.draught.Chessboard;
 
 public class MoveNode {
 
-    Position move;
-    Position capturedPiece;
-    ArrayList<MoveNode> furtherMoves;
+    Position newPosition;
+    Position positionCapturedPiece;
+    PIECE capturedPiece;
+    Chessboard chessboard;
 
-    public MoveNode(Position move, Position capturedPiece){
-        this.move = move;
-        this.capturedPiece = capturedPiece;
-        furtherMoves = new ArrayList<>();
+    public MoveNode(Position move, Position positionCapturedPiece, Chessboard chessboard){
+        this.newPosition = move;
+        this.positionCapturedPiece = positionCapturedPiece;
+        this.chessboard = chessboard;
+        if(positionCapturedPiece!=null) {
+            this.capturedPiece = this.chessboard.getCell(positionCapturedPiece);
+        }
     }
 
-    public void addChild(MoveNode moveNode) {
-        furtherMoves.add(moveNode);
+    public Position getNewPosition() {
+        return newPosition;
     }
 
-    public ArrayList<MoveNode> getChildren() {
-        return  furtherMoves;
+    public Position getPositionCapturedPiece() {
+        return positionCapturedPiece;
     }
 
-    public Position getMove() {
-        return move;
-    }
-
-    public Position getCapturedPiece() {
+    public PIECE getCapturedPiece() {
         return capturedPiece;
+    }
+
+    public Chessboard getChessboard() {
+        return chessboard;
     }
 }
