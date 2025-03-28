@@ -28,7 +28,7 @@ public class DraughtGameTest {
 
     @Test
     void testMoveNonExistingPiece(){
-        DraughtGame draughtGame = new DraughtGame(view,"p1","p2");
+        DraughtGame draughtGame = new DraughtGame(view);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(firstScenario));
         draughtGame.movePiece("7,7;6,6",COLOR.WHITE);
@@ -37,7 +37,7 @@ public class DraughtGameTest {
 
     @Test
     void testMoveOpponentPiece(){
-        DraughtGame draughtGame = new DraughtGame(view,"p1","p2");
+        DraughtGame draughtGame = new DraughtGame(view);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(firstScenario));
         draughtGame.movePiece("0,0;1,1", COLOR.WHITE);
@@ -46,7 +46,7 @@ public class DraughtGameTest {
 
     @Test
     void testAnomalousMove(){
-        DraughtGame draughtGame = new DraughtGame(view,"p1","p2");
+        DraughtGame draughtGame = new DraughtGame(view);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(firstScenario));
         draughtGame.movePiece("3,5;3,4",COLOR.WHITE);
@@ -55,7 +55,7 @@ public class DraughtGameTest {
 
     @Test
     void testAvoidCapture(){
-        DraughtGame draughtGame = new DraughtGame(view,"p1","p2");
+        DraughtGame draughtGame = new DraughtGame(view);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(secondScenario));
         draughtGame.movePiece("4,4;3,3",COLOR.WHITE);
@@ -64,7 +64,7 @@ public class DraughtGameTest {
 
     @Test
     void testCapturingKingWithPawn(){
-        DraughtGame draughtGame = new DraughtGame(view,"p1","p2");
+        DraughtGame draughtGame = new DraughtGame(view);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(thirdScenario));
         draughtGame.movePiece("4,4;6,2",COLOR.WHITE);
@@ -73,7 +73,7 @@ public class DraughtGameTest {
 
     @Test
     void testGoingOutOfBound(){
-        DraughtGame draughtGame = new DraughtGame(view,"p1","p2");
+        DraughtGame draughtGame = new DraughtGame(view);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(secondScenario));
         draughtGame.movePiece("4,4;6,2",COLOR.WHITE);
@@ -84,7 +84,7 @@ public class DraughtGameTest {
 
     @Test
     void testWhiteMakeDoubleMoves(){
-        DraughtGame draughtGame = new DraughtGame(view,"p1","p2");
+        DraughtGame draughtGame = new DraughtGame(view);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(firstScenario));
         draughtGame.movePiece("3,5;2,4",COLOR.WHITE);
@@ -94,7 +94,7 @@ public class DraughtGameTest {
     }
     @Test
     void testCapturingTwoPieces(){
-        DraughtGame draughtGame = new DraughtGame(view,"p1","p2");
+        DraughtGame draughtGame = new DraughtGame(view);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(fourthScenario));
         draughtGame.movePiece("3,5;1,3;3,1",COLOR.WHITE);
@@ -103,7 +103,7 @@ public class DraughtGameTest {
 
     @Test
     void testCapturingTwoPiecesInsteadOfThree(){
-        DraughtGame draughtGame = new DraughtGame(view,"p1","p2");
+        DraughtGame draughtGame = new DraughtGame(view);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(fifthScenario));
         draughtGame.movePiece("1,7;3,5;5,3",COLOR.WHITE);
@@ -112,7 +112,7 @@ public class DraughtGameTest {
 
     @Test
     void testPromotingPiece(){
-        DraughtGame draughtGame = new DraughtGame(view,"p1","p2");
+        DraughtGame draughtGame = new DraughtGame(view);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(sixthScenario));
         draughtGame.movePiece("1,1;2,0",COLOR.WHITE);
@@ -122,7 +122,7 @@ public class DraughtGameTest {
 
     @Test
     void testCapturingPawnInsteadOfKing(){
-        DraughtGame draughtGame = new DraughtGame(view,"p1","p2");
+        DraughtGame draughtGame = new DraughtGame(view);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(seventhScenario));
         draughtGame.movePiece("2,4;0,2",COLOR.WHITE);
@@ -131,7 +131,7 @@ public class DraughtGameTest {
 
     @Test
     void testCapturingWithPawnInsteadOfKing(){
-        DraughtGame draughtGame = new DraughtGame(view,"p1","p2");
+        DraughtGame draughtGame = new DraughtGame(view);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(eightScenario));
         draughtGame.movePiece("4,6;2,4;4,2",COLOR.WHITE);
@@ -142,7 +142,7 @@ public class DraughtGameTest {
 
     @Test
     void testCapturingOneKingInsteadTwoKing(){
-        DraughtGame draughtGame = new DraughtGame(view,"p1","p2");
+        DraughtGame draughtGame = new DraughtGame(view);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(nineScenario));
         draughtGame.movePiece("0,4;2,2;0,0",COLOR.WHITE);
@@ -154,7 +154,7 @@ public class DraughtGameTest {
 
     @Test
     void testCapturingSamePieceButWrongOrder(){
-        DraughtGame draughtGame = new DraughtGame(view,"p1","p2");
+        DraughtGame draughtGame = new DraughtGame(view);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(tenScenario));
         draughtGame.movePiece("0,4;2,2;0,0",COLOR.WHITE);
@@ -166,7 +166,7 @@ public class DraughtGameTest {
 
     @Test
     void testCapturingKingInsteadOfTwoPawn(){
-        DraughtGame draughtGame = new DraughtGame(view,"p1","p2");
+        DraughtGame draughtGame = new DraughtGame(view);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(elevenScenario));
         draughtGame.movePiece("7,3;5,1",COLOR.WHITE);

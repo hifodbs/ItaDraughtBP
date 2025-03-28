@@ -7,7 +7,6 @@ import units.berettapillinini.draught.bean.COLOR;
 import units.berettapillinini.draught.bean.PIECE;
 import units.berettapillinini.draught.game.util.FakeView;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,12 +20,6 @@ public class DraughtGameAcceptanceTest {
 
     String whiteWinThreeTurns = "6,2,BP;3,5,WP";
 
-    @Test
-    void personalTest(){
-        ArrayList<Integer> list = new ArrayList<>();
-        System.out.println(list.size());
-        list.add(1);
-    }
 
     @Test
     void testWhiteWin(){
@@ -61,7 +54,7 @@ public class DraughtGameAcceptanceTest {
 
     private DraughtGameAcceptanceTest startGame() {
         view = new FakeView();
-        game = new DraughtGame(view,"p1","p2");
+        game = new DraughtGame(view);
         game.start();
         return this;
     }

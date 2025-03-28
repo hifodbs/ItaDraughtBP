@@ -1,10 +1,11 @@
 package units.berettapillinini.draught;
 
 
+import units.berettapillinini.draught.bean.COLOR;
+import units.berettapillinini.draught.bean.MoveNode;
 import units.berettapillinini.draught.bean.PIECE;
 import units.berettapillinini.draught.bean.Position;
-
-import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 public class Chessboard{
 
@@ -54,5 +55,14 @@ public class Chessboard{
             for (int b = 0; b < 8;b++)
                 cloned.setSquare(new Position(b,a),getCell(new Position(b,a)));
         return cloned;
+    }
+
+    public ArrayList<MoveNode> getColorPieces(COLOR color){
+        ArrayList<MoveNode> colorPieces = new ArrayList<>();
+        for(int a = 0; a < 8;a++)
+            for (int b = 0; b < 8;b++)
+                if(gridSquare[a][b].getColor()==color)
+                    colorPieces.add(new MoveNode(new Position(b,a),null,this));
+        return colorPieces;
     }
 }

@@ -10,18 +10,13 @@ import static java.util.stream.Collectors.*;
 
 public class DraughtGame {
 
-    private String whitePlayer;
-    private String blackPlayer;
+    private final Chessboard chessboard;
 
-    private Chessboard chessboard;
-
-    private DraughtView draughtView;
+    private final DraughtView draughtView;
 
     private COLOR turn;
 
-    public DraughtGame(DraughtView draughtView, String name1, String name2){
-        whitePlayer = name1;
-        blackPlayer = name2;
+    public DraughtGame(DraughtView draughtView){
         chessboard = new Chessboard();
         this.draughtView = draughtView;
     }
@@ -37,44 +32,102 @@ public class DraughtGame {
     }
 
     public void movePiece(String move, COLOR player) {
-        if(player!=turn){
-            draughtView.on_next_turn("ERROR: It's black turn");
+        ArrayList<Position> positionOfPiece = new ArrayList<>();
+        String message =checkMoveCorrect(positionOfPiece,player,move);
+        if(!message.isEmpty()){
+            draughtView.on_next_turn(message);
             return;
         }
-        ArrayList<Position> positionOfPiece = new ArrayList<>();
-        Arrays.stream(move.split(";")).forEach(str->positionOfPiece
+
+        ArrayList<ArrayList<MoveNode>> paths = new ArrayList<>();
+        for(MoveNode moveNode : chessboard.getColorPieces(player)) {
+            PIECE p =  chessboard.getCell(moveNode.getNewPosition());
+            paths.addAll(checkPossiblePath(moveNode, p, getCatchablePiece(p)));
+        }
+        paths = getLegalMove(paths);
+
+        ArrayList<MoveNode> path = paths.stream().filter(p->p.stream().
+                        map(MoveNode::getNewPosition).toList().equals(positionOfPiece))
+                .findFirst().orElse(null);
+
+
+        if(path == null){
+            draughtView.on_next_turn("Can't move here");
+            return;
+        }
+
+        updateChessboard(path);
+        draughtView.on_chessboard_update(chessboard.getGrid());
+
+        turn = (turn==COLOR.WHITE)?COLOR.BLACK:COLOR.WHITE;
+
+        String m = getMessageEndTurn(player);
+        draughtView.on_next_turn(m);
+    }
+
+    private String getMessageEndTurn(COLOR player) {
+        boolean game_end = chessboard.getColorPieces((player ==COLOR.WHITE)?COLOR.BLACK:COLOR.WHITE).isEmpty();
+        String m;
+        if(player == COLOR.WHITE)
+            m = (game_end) ? "White win" : "Black turn";
+        else
+            m = (game_end) ? "Black win" : "White turn";
+        return m;
+    }
+
+    private void updateChessboard(ArrayList<MoveNode> path) {
+        Position var = path.get(path.size()-1).getNewPosition();
+        PIECE movedPiece = chessboard.getCell(path.get(0).getNewPosition());
+        for(MoveNode moveNode : path){
+            chessboard.setSquare(moveNode.getNewPosition(),PIECE.EMPTY);
+            if(moveNode.getPositionCapturedPiece()!=null)
+                chessboard.setSquare(moveNode.getPositionCapturedPiece(),PIECE.EMPTY);
+        }
+        if(var.getY()==0 && movedPiece == PIECE.WHITE_PAWN){
+            chessboard.setSquare(var,PIECE.WHITE_KING);
+        } else if (var.getY() == 8 && movedPiece == PIECE.BLACK_PAWN){
+
+            chessboard.setSquare(var,PIECE.BLACK_KING);
+        }else {
+            chessboard.setSquare(var,movedPiece);
+        }
+    }
+
+    private String checkMoveCorrect(ArrayList<Position> positions, COLOR player, String move) {
+        if(player!=turn){
+            return"ERROR: It's black turn";
+        }
+        Arrays.stream(move.split(";")).forEach(str->positions
                 .add(new Position(Integer.parseInt(str.split(",")[0]),Integer.parseInt(str.split(",")[1]))));
 
-        PIECE oldCell = chessboard.getCell(positionOfPiece.get(0));
-
-        if(oldCell == PIECE.EMPTY) {
-            draughtView.on_next_turn("No existing piece");
-            return;
+        if(chessboard.getCell(positions.get(0)) == PIECE.EMPTY) {
+            return "No existing piece";
         }
 
-        if(player != oldCell.getColor()){
-            draughtView.on_next_turn("Can't move opponent piece");
-            return;
+        if(player != chessboard.getCell(positions.get(0)).getColor()){
+            return "Can't move opponent piece";
         }
 
-        MoveNode pathNode = new MoveNode(positionOfPiece.get(0),null,chessboard);
-        ArrayList<ArrayList<MoveNode>> paths = new ArrayList<>();
-        for(int a = 0; a < 8; a++)
-            for(int b = 0; b < 8;b++)
-                if(chessboard.getCell(new Position(b,a)).getColor()==player){
-                    pathNode = new MoveNode(new Position(b,a),null,chessboard);
-                    paths.addAll(checkPossiblePath(pathNode,chessboard.getCell(pathNode.getNewPosition()),getCatchablePiece(chessboard.getCell(pathNode.getNewPosition()))));
-            }
+        return "";
+    }
 
+    private ArrayList<ArrayList<MoveNode>> getLegalMove(ArrayList<ArrayList<MoveNode>> paths) {
         if(paths.stream().anyMatch(moveNodes -> moveNodes.stream().anyMatch(moveNode -> moveNode.getCapturedPiece()!=null)))
         {
-            int depth = Objects.requireNonNull(paths.stream().max(Comparator.comparing(ArrayList::size)).orElse(null)).size();
+            int depth = paths.stream().max(Comparator.comparing(ArrayList::size)).get().size();
             paths = paths.stream().filter(moveNodes -> moveNodes.size()==depth).collect(Collectors.toCollection(ArrayList::new));
 
-            if (paths.stream().anyMatch(moveNodes -> chessboard.getCell(moveNodes.get(0).getNewPosition()).getGrade()==GRADE.KING)){
-                paths = paths.stream().filter(moveNodes -> chessboard.getCell(moveNodes.get(0).getNewPosition()).getGrade()==GRADE.KING)
-                        .collect(Collectors.toCollection(ArrayList::new));
+            if(paths.size()==1)
+                return paths;
+
+            if (paths.stream().noneMatch(moveNodes -> chessboard.getCell(moveNodes.get(0).getNewPosition()).getGrade()==GRADE.KING)){
+                return paths;
             }
+            paths = paths.stream().filter(moveNodes -> chessboard.getCell(moveNodes.get(0).getNewPosition()).getGrade()==GRADE.KING)
+                    .collect(Collectors.toCollection(ArrayList::new));
+
+            if(paths.size()==1)
+                return paths;
 
             int nKing = paths.stream().map(moveNodes -> moveNodes.stream().filter(moveNode -> moveNode.getCapturedPiece()!=null)
                     .mapToInt(moveNode -> (moveNode.getCapturedPiece().getGrade()==GRADE.KING)?1:0).sum()).max(Comparator.naturalOrder()).orElse(0);
@@ -82,6 +135,9 @@ public class DraughtGame {
             paths = paths.stream().filter(moveNodes -> moveNodes.stream().filter(moveNode -> moveNode.getCapturedPiece()!=null)
                             .mapToInt(moveNode -> (moveNode.getCapturedPiece().getGrade()==GRADE.KING)?1:0).sum()==nKing)
                     .collect(Collectors.toCollection(ArrayList::new));
+
+            if(paths.size()==1)
+                return paths;
 
             int firstEncounter = paths.stream().mapToInt(moveNodes ->
                             IntStream.range(0,moveNodes.size()).filter(i -> moveNodes.get(i).getCapturedPiece()!=null)
@@ -92,41 +148,7 @@ public class DraughtGame {
                                     .anyMatch(i -> (moveNodes.get(i).getCapturedPiece().getGrade()==GRADE.KING && i == firstEncounter)|| firstEncounter==-1))
                     .collect(Collectors.toCollection(ArrayList::new));
         }
-
-
-        ArrayList<MoveNode> path = paths.stream().filter(p->p.stream().map(MoveNode::getNewPosition).toList().containsAll(positionOfPiece)
-                && positionOfPiece.containsAll(p.stream().map(MoveNode::getNewPosition).toList())).findFirst().orElse(null);
-
-
-        if(path == null){
-            draughtView.on_next_turn("Can't move here");
-            return;
-        }
-
-        for(MoveNode moveNode : path){
-            chessboard.setSquare(moveNode.getNewPosition(),PIECE.EMPTY);
-            if(moveNode.getPositionCapturedPiece()!=null)
-                chessboard.setSquare(moveNode.getPositionCapturedPiece(),PIECE.EMPTY);
-        }
-        Position var = path.remove(path.size()-1).getNewPosition();
-        if(var.getY()==0 && oldCell == PIECE.WHITE_PAWN){
-            chessboard.setSquare(var,PIECE.WHITE_KING);
-        } else if (var.getY() == 8 && oldCell == PIECE.BLACK_PAWN){
-
-            chessboard.setSquare(var,PIECE.BLACK_KING);
-        }else {
-            chessboard.setSquare(var,oldCell);
-        }
-
-        draughtView.on_chessboard_update(chessboard.getGrid());
-        boolean game_end = checkGameEnd(player);
-        String m;
-        if(player == COLOR.WHITE)
-            m = (game_end) ? "White win" : "Black turn";
-        else
-            m = (game_end) ? "Black win" : "White turn";
-        turn = (turn==COLOR.WHITE)?COLOR.BLACK:COLOR.WHITE;
-        draughtView.on_next_turn(m);
+        return paths;
     }
 
     public EnumSet<PIECE> getCatchablePiece(PIECE oldCell) {
@@ -141,10 +163,10 @@ public class DraughtGame {
         return p.getY() >= 0 && p.getY() < 8;
     }
 
-    private ArrayList<ArrayList<MoveNode>> checkPossiblePath(MoveNode possiblePath, PIECE oldCell, EnumSet<PIECE> catchablePieces) {
+    private ArrayList<ArrayList<MoveNode>> checkPossiblePath(MoveNode possiblePath, PIECE piece, EnumSet<PIECE> catchablePieces) {
         ArrayList<ArrayList<MoveNode>> paths = new ArrayList<>();
         Chessboard currentChessboard = possiblePath.getChessboard();
-        Set<Position> possiblePosition = oldCell.getMoveList().stream()
+        Set<Position> possiblePosition = piece.getMoveList().stream()
                 .filter(move->checkBound(Position.add(move,possiblePath.getNewPosition()))
                         && checkBound(Position.add(move,Position.add(move,possiblePath.getNewPosition()))))
                 .filter(move -> catchablePieces.contains(currentChessboard.getCell(Position.add(move,possiblePath.getNewPosition())))
@@ -156,14 +178,11 @@ public class DraughtGame {
                 MoveNode moveNode = new MoveNode(Position.add(possiblePath.getNewPosition(),Position.add(pp,pp)),Position.add(pp,possiblePath.getNewPosition()),furtherChessboard);
                 furtherChessboard.setSquare(possiblePath.getNewPosition(),PIECE.EMPTY);
                 furtherChessboard.setSquare(moveNode.getPositionCapturedPiece(),PIECE.EMPTY);
-                furtherChessboard.setSquare(moveNode.getNewPosition(),oldCell);
-                ArrayList<ArrayList<MoveNode>> bar = checkPossiblePath(moveNode, oldCell, catchablePieces);
+                furtherChessboard.setSquare(moveNode.getNewPosition(),piece);
+                ArrayList<ArrayList<MoveNode>> bar = checkPossiblePath(moveNode, piece, catchablePieces);
                 bar.forEach(path->path.add(0,possiblePath));
                 paths.addAll(bar);
             }
-            //paths.stream().sorted(Comparator.comparing(ArrayList::size));
-            //int depth = Objects.requireNonNull(paths.stream().max(Comparator.comparing(ArrayList::size)).orElse(null)).size();
-            //paths = (ArrayList<ArrayList<MoveNode>>) paths.stream().filter(moveNodes -> moveNodes.size()==depth).toList();
             return paths;
         }
 
@@ -174,7 +193,7 @@ public class DraughtGame {
             return paths;
         }
 
-        possiblePosition =  oldCell.getMoveList().stream().filter(move->checkBound(Position.add(move,possiblePath.getNewPosition())))
+        possiblePosition =  piece.getMoveList().stream().filter(move->checkBound(Position.add(move,possiblePath.getNewPosition())))
                 .filter(move->currentChessboard.getCell(Position.add(move,possiblePath.getNewPosition()))==PIECE.EMPTY)
                 .collect(toSet());
         for(Position pp: possiblePosition)
@@ -185,20 +204,6 @@ public class DraughtGame {
             paths.add(test);
         }
         return paths;
-    }
-
-
-    private boolean checkGameEnd(COLOR player) {
-        EnumSet<PIECE> set;
-        if(player == COLOR.WHITE)
-            set = EnumSet.of(PIECE.BLACK_KING,PIECE.BLACK_PAWN);
-        else
-            set = EnumSet.of(PIECE.WHITE_KING,PIECE.WHITE_PAWN);
-
-        PIECE[][] grid = chessboard.getGrid();
-
-        return Arrays.stream(grid).flatMap(Arrays::stream)
-                .noneMatch(set::contains);
     }
 
 }
