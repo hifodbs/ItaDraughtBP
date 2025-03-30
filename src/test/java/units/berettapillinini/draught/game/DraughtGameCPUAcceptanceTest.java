@@ -26,7 +26,6 @@ public class DraughtGameCPUAcceptanceTest {
     @Test
     void testWhiteWin(){
         //TODO
-        /*
         startGame().verifyChessboard(new Chessboard().getGrid());
         game.getChessboard().setGrid(createGrid(whiteWinScenario));
         cpuTurn().verifyMessage("Black turn").verifyChessboard(createGrid("3,1,BK;5,1,WP;3,3,WP;4,2,WK;0,4,BP;2,4,WP;1,5,BK;3,5,BP"));
@@ -41,7 +40,7 @@ public class DraughtGameCPUAcceptanceTest {
         cpuTurn().verifyMessage("Black turn").verifyChessboard(createGrid("2,6,WK;0,4,BP"));
         blackTurn("0,4;1,5").verifyMessage("White turn").verifyChessboard(createGrid("2,6,WK;1,5,BP"));
 
-        cpuTurn().verifyMessage("White wim").verifyChessboard(createGrid("0,4,WK"));*/
+        cpuTurn().verifyMessage("White wim").verifyChessboard(createGrid("0,4,WK"));
 
 
     }

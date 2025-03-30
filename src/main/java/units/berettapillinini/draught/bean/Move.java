@@ -11,10 +11,9 @@ public class Move {
     ArrayList<Position> cellVisited;
     ArrayList<Position> positionCapturedPieces;
     ArrayList<PIECE> capturedPieces;
-    Chessboard chessboard;
     PIECE piece;
 
-    public Move(Position move, Position positionCapturedPiece, Chessboard chessboard, PIECE piece){
+    public Move(Position move, Position positionCapturedPiece, PIECE capturedPiece, PIECE piece){
         cellVisited = new ArrayList<>();
         positionCapturedPieces = new ArrayList<>();
         capturedPieces = new ArrayList<>();
@@ -22,18 +21,23 @@ public class Move {
         cellVisited.add(move);
         positionCapturedPieces.add(positionCapturedPiece);
         this.piece = piece;
-        this.chessboard = chessboard;
-        if(positionCapturedPiece!=null) {
-            capturedPieces.add(this.chessboard.getCell(positionCapturedPiece));
-        }
+        capturedPieces.add(capturedPiece);
     }
+    
 
-    public Move(ArrayList<Position> cellVisited, ArrayList<Position> positionCapturedPieces, ArrayList<PIECE> capturedPieces,Chessboard chessboard, PIECE piece) {
+    public Move(ArrayList<Position> cellVisited, ArrayList<Position> positionCapturedPieces, ArrayList<PIECE> capturedPieces, PIECE piece) {
         this.cellVisited = cellVisited;
-        this.chessboard = chessboard;
         this.positionCapturedPieces = positionCapturedPieces;
         this.capturedPieces = capturedPieces;
         this.piece = piece;
+    }
+
+    public Move(Position pos, PIECE p) {
+        cellVisited = new ArrayList<>();
+        positionCapturedPieces = new ArrayList<>();
+        capturedPieces = new ArrayList<>();
+        cellVisited.add(pos);
+        piece = p;
     }
 
     public ArrayList<Position> getCellVisited() {
@@ -52,9 +56,6 @@ public class Move {
         return piece;
     }
 
-    public Chessboard getChessboard() {
-        return chessboard;
-    }
 
     public Position getLastVisited() {
         return cellVisited.get(cellVisited.size()-1);
@@ -66,17 +67,13 @@ public class Move {
 
     public Move makeCopy() {
         return new Move((ArrayList<Position>) getCellVisited().clone(), (ArrayList<Position>) getPositionCapturedPieces().clone(),
-        (ArrayList<PIECE>) getCapturedPieces().clone(),getChessboard().makeCopy(),getPiece());
+        (ArrayList<PIECE>) getCapturedPieces().clone(),getPiece());
     }
 
-    public void addJump(Position newCellVisited, Position positionCapturedPiece) {
-        chessboard.setSquare(getLastVisited(),PIECE.EMPTY);
+    public void addJump(Position newCellVisited, Position positionCapturedPiece, PIECE capturedPiece) {
         cellVisited.add(newCellVisited);
-        if(positionCapturedPiece!=null) {
-            positionCapturedPieces.add(positionCapturedPiece);
-            capturedPieces.add(chessboard.getCell(positionCapturedPiece));
-            chessboard.setSquare(positionCapturedPiece, PIECE.EMPTY);
-        }
+        positionCapturedPieces.add(positionCapturedPiece);
+        capturedPieces.add(capturedPiece);
     }
 
     public  int getNumberOfKing() {
@@ -88,5 +85,9 @@ public class Move {
     public int getFirstKingEncounter() {
         return IntStream.range(0,getCapturedPieces().size()).filter(i -> getCapturedPieces().get(i).getGrade()==GRADE.KING)
                 .findFirst().orElse(-1);
+    }
+
+    public void addJump(Position pos) {
+        cellVisited.add(pos);
     }
 }

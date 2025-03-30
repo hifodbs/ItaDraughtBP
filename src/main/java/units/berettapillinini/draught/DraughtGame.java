@@ -42,7 +42,7 @@ public class DraughtGame {
         ArrayList<Move> paths = new ArrayList<>();
         for(Position pos : chessboard.getPositionColorPieces(player)) {
             PIECE p =  chessboard.getCell(pos);
-            paths.addAll(checkPossiblePath(new Move(pos, null,chessboard,p ), getCatchablePiece(p)));
+            paths.addAll(checkPossiblePath(new Move(pos,p), getCatchablePiece(p),chessboard));
         }
         paths = getLegalMove(paths);
 
@@ -74,10 +74,11 @@ public class DraughtGame {
         return m;
     }
 
-    private void updateChessboard(Move path) {
-        chessboard.setGrid(path.getChessboard().getGrid());
-        Position var = path.getLastVisited();
-        PIECE movedPiece = path.getPiece();
+    private void updateChessboard(Move move) {
+        move.getPositionCapturedPieces().forEach(p->chessboard.setSquare(p,PIECE.EMPTY));
+        chessboard.setSquare(move.getCellVisited().get(0),PIECE.EMPTY);
+        Position var = move.getLastVisited();
+        PIECE movedPiece = move.getPiece();
         if(var.getY()==0 && movedPiece == PIECE.WHITE_PAWN){
             chessboard.setSquare(var,PIECE.WHITE_KING);
         } else if (var.getY() == 8 && movedPiece == PIECE.BLACK_PAWN){
@@ -154,9 +155,9 @@ public class DraughtGame {
         return p.getY() >= 0 && p.getY() < 8;
     }
 
-    private ArrayList<Move> checkPossiblePath(Move possibleMove, EnumSet<PIECE> catchablePieces) {
+    private ArrayList<Move> checkPossiblePath(Move possibleMove, EnumSet<PIECE> catchablePieces, Chessboard currentChessboard) {
         ArrayList<Move> moves = new ArrayList<>();
-        Chessboard currentChessboard = possibleMove.getChessboard();
+
         Set<Position> possiblePosition = possibleMove.getPiece().getMoveList().stream()
                 .filter(move->checkBound(Position.add(move,possibleMove.getLastVisited()))
                         && checkBound(Position.add(move,Position.add(move,possibleMove.getLastVisited()))))
@@ -165,9 +166,14 @@ public class DraughtGame {
 
         if(!possiblePosition.isEmpty()){
             for(Position pp : possiblePosition){
+                Chessboard furtherChessboard = currentChessboard.makeCopy();
                 Move furtherMove = possibleMove.makeCopy();
-                furtherMove.addJump(Position.add(possibleMove.getLastVisited(),Position.add(pp,pp)),Position.add(pp,possibleMove.getLastVisited()));
-                ArrayList<Move> bar = checkPossiblePath(furtherMove, catchablePieces);
+                furtherMove.addJump(Position.add(possibleMove.getLastVisited(),Position.add(pp,pp)),Position.add(pp,possibleMove.getLastVisited())
+                    ,furtherChessboard.getCell(Position.add(pp,possibleMove.getLastVisited())));
+                furtherChessboard.setSquare(possibleMove.getLastVisited(),PIECE.EMPTY);
+                furtherChessboard.setSquare(Position.add(pp,possibleMove.getLastVisited()),PIECE.EMPTY);
+                furtherChessboard.setSquare(furtherMove.getLastVisited(),furtherMove.getPiece());
+                ArrayList<Move> bar = checkPossiblePath(furtherMove, catchablePieces,furtherChessboard);
                 moves.addAll(bar);
             }
             return moves;
@@ -184,7 +190,7 @@ public class DraughtGame {
         for(Position pp: possiblePosition)
         {
             Move furtherMove = possibleMove.makeCopy();
-            furtherMove.addJump(Position.add(possibleMove.getLastVisited(),pp),null);
+            furtherMove.addJump(Position.add(possibleMove.getLastVisited(),pp));
             moves.add(furtherMove);
         }
         return moves;
