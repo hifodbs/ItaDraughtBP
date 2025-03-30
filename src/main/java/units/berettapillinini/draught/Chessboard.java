@@ -2,7 +2,6 @@ package units.berettapillinini.draught;
 
 
 import units.berettapillinini.draught.bean.COLOR;
-import units.berettapillinini.draught.bean.MoveNode;
 import units.berettapillinini.draught.bean.PIECE;
 import units.berettapillinini.draught.bean.Position;
 import java.util.ArrayList;
@@ -57,12 +56,12 @@ public class Chessboard{
         return cloned;
     }
 
-    public ArrayList<MoveNode> getColorPieces(COLOR color){
-        ArrayList<MoveNode> colorPieces = new ArrayList<>();
+    public ArrayList<Position> getPositionColorPieces(COLOR color){
+        ArrayList<Position> colorPieces = new ArrayList<>();
         for(int a = 0; a < 8;a++)
             for (int b = 0; b < 8;b++)
                 if(gridSquare[a][b].getColor()==color)
-                    colorPieces.add(new MoveNode(new Position(b,a),null,this));
+                    colorPieces.add(new Position(b,a));
         return colorPieces;
     }
 }

@@ -48,12 +48,12 @@ public class FakeView implements DraughtView {
     }
 
     @Override
-    public void on_next_turn(String m) {
-        message = m;
+    public  void on_close(){
+        close = true;
     }
 
     @Override
-    public  void on_close(){
-        close = true;
+    public void on_next_turn(String m) {
+        message = m;
     }
 }
