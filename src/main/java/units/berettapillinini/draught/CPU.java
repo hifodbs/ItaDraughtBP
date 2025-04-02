@@ -13,6 +13,7 @@ public class CPU{
     COLOR color;
     int depth;
     Chessboard chessboard;
+    Move move;
 
     public CPU(COLOR color, int depth, Chessboard chessboard){
         this.color = color;
@@ -20,72 +21,63 @@ public class CPU{
         this.chessboard = chessboard;
     }
 
-    public String getBestMove() {
 
-        MoveNode tree = new MoveNode(null,chessboard);
-        createTree(tree,depth,color);
-
-        ArrayList<Move> moves = tree.getChild().stream().filter(moveNode -> moveNode.getValue()==tree.getValue()).map(MoveNode::getMove)
-                .collect(Collectors.toCollection(ArrayList::new));
-
-        Move move = moves.get(0);
-        if(moves.size()>1) {
-            System.out.println("Più soluzioni trovate:");
-            move = moves.stream().findAny().orElse(null);
-            for(Move test : moves)
-                System.out.println(test.encode());
-            System.out.println("Fine soluzioni trovate");
-        }
-
+    public String getBestMove(){
+        int bestVal =  minMax(depth, chessboard,color,Integer.MIN_VALUE,Integer.MAX_VALUE);
+        System.out.println("Best val found : "+ bestVal);
         return move.encode();
     }
 
-
-    private void createTree(MoveNode moveNode, int depth, COLOR color) {
+    private int minMax(int depth, Chessboard chessboard, COLOR color, int alpha, int beta) {
         if(depth==0)
-            return ;
+            return chessboard.getVal();
 
         ArrayList<Move> moves = new ArrayList<>();
-        for(Position pos : moveNode.getChessboard().getPositionColorPieces(color)) {
-            PIECE p =  moveNode.getChessboard().getCell(pos);
-            moves.addAll(checkPossiblePath(new Move(pos,p ), getCatchablePiece(p),moveNode.getChessboard()));
+        for(Position pos : chessboard.getPositionColorPieces(color)) {
+            PIECE p =  chessboard.getCell(pos);
+            moves.addAll(checkPossiblePath(new Move(pos,p ), getCatchablePiece(p),chessboard));
         }
         moves = getLegalMove(moves);
 
-        for(Move move : moves){
-            Chessboard furtherChessboard = moveNode.getChessboard().makeCopy();
-            furtherChessboard.applyMove(move);
-            moveNode.addChild(new MoveNode(move,furtherChessboard));
-        }
+        if(moves.isEmpty())
+            return (color==COLOR.WHITE)?Integer.MIN_VALUE:Integer.MAX_VALUE;
 
-        for(MoveNode child : moveNode.getChild()) {
-            if(!child.getChessboard().getPositionColorPieces((color == COLOR.WHITE) ? COLOR.BLACK : COLOR.WHITE).isEmpty())
-                createTree(child, depth - 1, (color == COLOR.WHITE) ? COLOR.BLACK : COLOR.WHITE);
-        }
-
-        if (moveNode.getChild().isEmpty()){
-            int ver = 1;
-            if(color==COLOR.BLACK)
-                ver*=-1;
-            moveNode.setValue(ver*1000);
-            return;
-        }
-        int valu = 0;
-        int best_value = moveNode.getChild().get(0).getValue();
-        for(MoveNode child : moveNode.getChild()){
-            valu = child.getValue();
-            if(color == COLOR.WHITE && valu > best_value){
-                best_value = valu;
+        if(color==COLOR.WHITE){
+            int maxEval = Integer.MIN_VALUE;
+            int eval;
+            Chessboard furtherChessboard;
+            for(Move move :moves){
+                furtherChessboard = chessboard.makeCopy();
+                furtherChessboard.applyMove(move);
+                eval = minMax(depth-1,furtherChessboard,COLOR.BLACK,alpha,beta);
+                if(eval>maxEval){
+                    maxEval = eval;
+                    this.move = move;
+                }
+                alpha = Math.max(alpha,eval);
+                if (beta <= alpha)
+                    break;
             }
-            if(color == COLOR.BLACK && valu < best_value){
-                best_value = valu;
+            return maxEval;
+        }else {
+            int minEval = Integer.MAX_VALUE;
+            int eval;
+            Chessboard furtherChessboard;
+            for(Move move :moves){
+                furtherChessboard = chessboard.makeCopy();
+                furtherChessboard.applyMove(move);
+                eval = minMax(depth-1,furtherChessboard,COLOR.WHITE,alpha,beta);
+                if(eval<minEval){
+                    minEval = eval;
+                    this.move = move;
+                }
+                beta = Math.min(beta,eval);
+                if (beta <= alpha)
+                    break;
             }
+            return minEval;
         }
-        moveNode.setValue(best_value);
-
     }
-
-
 
     private ArrayList<Move> getLegalMove(ArrayList<Move> paths) {
         int depth = paths.stream().mapToInt(move -> move.getCapturedPieces().size()).max().orElse(0);

@@ -85,9 +85,9 @@ public class Chessboard{
 
     public int getVal(){
         if(getPositionColorPieces(COLOR.WHITE).isEmpty())
-            return -1000;
+            return Integer.MIN_VALUE;
         if(getPositionColorPieces(COLOR.BLACK).isEmpty())
-            return 1000;
+            return Integer.MAX_VALUE;
         return Arrays.stream(gridSquare).flatMap(Arrays::stream).
                 mapToInt(PIECE::getValue).sum();
     }

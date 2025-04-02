@@ -29,7 +29,7 @@ public class DraughtGameCPU7MovesAcceptanceTest {
         //TODO
         startGame().verifyChessboard(new Chessboard().getGrid());
         game.getChessboard().setGrid(createGrid(whiteWinScenario));
-
+        cpu.getBestMove();
         cpuTurn().verifyMessage("Black turn").verifyChessboard(createGrid("5,3,BK;5,1,WP;4,2,WP;0,4,BP;2,4,WP;1,5,BK;3,5,BP"));
         blackTurn("1,5;3,3").verifyMessage("White turn").verifyChessboard(createGrid("5,3,BK;5,1,WP;4,2,WP;0,4,BP;3,3,BK;3,5,BP"));
 
