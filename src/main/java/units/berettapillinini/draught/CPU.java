@@ -22,53 +22,69 @@ public class CPU{
 
     public String getBestMove() {
 
-       /* MoveNode tree = new MoveNode(new Move(null,null,null,chessboard,null));
+        MoveNode tree = new MoveNode(null,chessboard);
         createTree(tree,depth,color);
+
+        ArrayList<Move> moves = tree.getChild().stream().filter(moveNode -> moveNode.getValue()==tree.getValue()).map(MoveNode::getMove)
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        Move move = moves.get(0);
+        if(moves.size()>1) {
+            System.out.println("Più soluzioni trovate:");
+            move = moves.stream().findAny().orElse(null);
+            for(Move test : moves)
+                System.out.println(test.encode());
+            System.out.println("Fine soluzioni trovate");
+        }
+
+        return move.encode();
+    }
+
+
+    private void createTree(MoveNode moveNode, int depth, COLOR color) {
+        if(depth==0)
+            return ;
+
         ArrayList<Move> moves = new ArrayList<>();
-        for(Position pos : chessboard.getPositionColorPieces(color)) {
-            PIECE p =  chessboard.getCell(pos);
-            moves.addAll(checkPossiblePath(new Move(pos, null,chessboard,p ), getCatchablePiece(p)));
+        for(Position pos : moveNode.getChessboard().getPositionColorPieces(color)) {
+            PIECE p =  moveNode.getChessboard().getCell(pos);
+            moves.addAll(checkPossiblePath(new Move(pos,p ), getCatchablePiece(p),moveNode.getChessboard()));
         }
         moves = getLegalMove(moves);
 
-        ArrayList<Move> bestPath = getBestPath(depth,move,color);
-*/
-        return "";
-    }
-
-    private MoveNode createTree(MoveNode moveNode, int depth, COLOR color) {
-        ArrayList<Move> moves = new ArrayList<>();
-        /*
-        for(Position pos : chessboard.getPositionColorPieces(color)) {
-            PIECE p =  chessboard.getCell(pos);
-            moves.addAll(checkPossiblePath(new Move(pos, null,chessboard,p ), getCatchablePiece(p)));
+        for(Move move : moves){
+            Chessboard furtherChessboard = moveNode.getChessboard().makeCopy();
+            furtherChessboard.applyMove(move);
+            moveNode.addChild(new MoveNode(move,furtherChessboard));
         }
 
-         */
-        moves = getLegalMove(moves);
-        return moveNode;
-    }
-
-    private ArrayList<Move> getBestPath(int depth, ArrayList<Move> moves, COLOR color) {
-/*
-        ArrayList<Move> furtherMoves = new ArrayList<>();
-        for(Position pos : moves.getPositionColorPieces(color)) {
-            PIECE p =  chessboard.getCell(pos);
-            moves.addAll(checkPossiblePath(new Move(pos, null,chessboard,p ), getCatchablePiece(p)));
+        for(MoveNode child : moveNode.getChild()) {
+            if(!child.getChessboard().getPositionColorPieces((color == COLOR.WHITE) ? COLOR.BLACK : COLOR.WHITE).isEmpty())
+                createTree(child, depth - 1, (color == COLOR.WHITE) ? COLOR.BLACK : COLOR.WHITE);
         }
-        moves = getLegalMove(moves);
 
-        int bestVal = moves.stream().mapToInt(move -> getVal(move.getChessboard())).max().orElse(0);
-        ArrayList<Move> bestMove = moves.stream().filter(move -> getVal(move.getChessboard())==bestVal)
-                .collect(Collectors.toCollection(ArrayList::new));*/
-        return moves;
+        if (moveNode.getChild().isEmpty()){
+            int ver = 1;
+            if(color==COLOR.BLACK)
+                ver*=-1;
+            moveNode.setValue(ver*1000);
+            return;
+        }
+        int valu = 0;
+        int best_value = moveNode.getChild().get(0).getValue();
+        for(MoveNode child : moveNode.getChild()){
+            valu = child.getValue();
+            if(color == COLOR.WHITE && valu > best_value){
+                best_value = valu;
+            }
+            if(color == COLOR.BLACK && valu < best_value){
+                best_value = valu;
+            }
+        }
+        moveNode.setValue(best_value);
+
     }
 
-    private int getVal(Chessboard chessboard) {
-        int val = 0;
-        val = Arrays.stream(chessboard.getGrid()).flatMap(Arrays::stream).mapToInt(PIECE::getValue).sum();
-        return val;
-    }
 
 
     private ArrayList<Move> getLegalMove(ArrayList<Move> paths) {
@@ -117,6 +133,47 @@ public class CPU{
         if(p.getX()<0||p.getX()>=8)
             return false;
         return p.getY() >= 0 && p.getY() < 8;
+    }
+
+    private ArrayList<Move> checkPossiblePath(Move possibleMove, EnumSet<PIECE> catchablePieces, Chessboard currentChessboard) {
+        ArrayList<Move> moves = new ArrayList<>();
+
+        Set<Position> possiblePosition = possibleMove.getPiece().getMoveList().stream()
+                .filter(move->checkBound(Position.add(move,possibleMove.getLastVisited()))
+                        && checkBound(Position.add(move,Position.add(move,possibleMove.getLastVisited()))))
+                .filter(move -> catchablePieces.contains(currentChessboard.getCell(Position.add(move,possibleMove.getLastVisited())))
+                        && currentChessboard.getCell(Position.add(move,Position.add(move,possibleMove.getLastVisited()))) == PIECE.EMPTY).collect(toSet());
+
+        if(!possiblePosition.isEmpty()){
+            for(Position pp : possiblePosition){
+                Chessboard furtherChessboard = currentChessboard.makeCopy();
+                Move furtherMove = possibleMove.makeCopy();
+                furtherMove.addJump(Position.add(possibleMove.getLastVisited(),Position.add(pp,pp)),Position.add(pp,possibleMove.getLastVisited())
+                        ,furtherChessboard.getCell(Position.add(pp,possibleMove.getLastVisited())));
+                furtherChessboard.setSquare(possibleMove.getLastVisited(),PIECE.EMPTY);
+                furtherChessboard.setSquare(Position.add(pp,possibleMove.getLastVisited()),PIECE.EMPTY);
+                furtherChessboard.setSquare(furtherMove.getLastVisited(),furtherMove.getPiece());
+                ArrayList<Move> bar = checkPossiblePath(furtherMove, catchablePieces,furtherChessboard);
+                moves.addAll(bar);
+            }
+            return moves;
+        }
+
+        if(!possibleMove.getCapturedPieces().isEmpty()){
+            moves.add(possibleMove);
+            return moves;
+        }
+
+        possiblePosition =  possibleMove.getPiece().getMoveList().stream().filter(move->checkBound(Position.add(move,possibleMove.getLastVisited())))
+                .filter(move->currentChessboard.getCell(Position.add(move,possibleMove.getLastVisited()))==PIECE.EMPTY)
+                .collect(toSet());
+        for(Position pp: possiblePosition)
+        {
+            Move furtherMove = possibleMove.makeCopy();
+            furtherMove.addJump(Position.add(possibleMove.getLastVisited(),pp));
+            moves.add(furtherMove);
+        }
+        return moves;
     }
 
 }

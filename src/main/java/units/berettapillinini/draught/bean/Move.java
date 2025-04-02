@@ -90,4 +90,12 @@ public class Move {
     public void addJump(Position pos) {
         cellVisited.add(pos);
     }
+
+    public String encode() {
+        String move = "";
+        for(Position p : cellVisited)
+            move += ";"+p.getX()+","+p.getY();
+        move = move.substring(1);
+        return move;
+    }
 }

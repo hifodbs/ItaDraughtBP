@@ -2,9 +2,11 @@ package units.berettapillinini.draught;
 
 
 import units.berettapillinini.draught.bean.COLOR;
+import units.berettapillinini.draught.bean.Move;
 import units.berettapillinini.draught.bean.PIECE;
 import units.berettapillinini.draught.bean.Position;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Chessboard{
 
@@ -63,5 +65,30 @@ public class Chessboard{
                 if(gridSquare[a][b].getColor()==color)
                     colorPieces.add(new Position(b,a));
         return colorPieces;
+    }
+
+    public void applyMove(Move move) {
+        Position pos = move.getLastVisited();
+        PIECE piece = move.getPiece();
+        setSquare(move.getLastVisited(),move.getPiece());
+        move.getCellVisited().forEach(position -> setSquare(position,PIECE.EMPTY));
+        move.getPositionCapturedPieces().forEach(position -> setSquare(position,PIECE.EMPTY));
+        if(pos.getY()==0 && piece == PIECE.WHITE_PAWN){
+            setSquare(pos,PIECE.WHITE_KING);
+        } else if (pos.getY() == 8 && piece == PIECE.BLACK_PAWN){
+
+            setSquare(pos,PIECE.BLACK_KING);
+        }else {
+            setSquare(pos,piece);
+        }
+    }
+
+    public int getVal(){
+        if(getPositionColorPieces(COLOR.WHITE).isEmpty())
+            return -1000;
+        if(getPositionColorPieces(COLOR.BLACK).isEmpty())
+            return 1000;
+        return Arrays.stream(gridSquare).flatMap(Arrays::stream).
+                mapToInt(PIECE::getValue).sum();
     }
 }

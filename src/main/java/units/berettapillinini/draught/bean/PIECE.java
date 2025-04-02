@@ -72,8 +72,8 @@ public enum PIECE {
     }
 
     public int getValue() {
-        int color = (getColor() == WHITE)?1:-1;
-        int value = (getGrade() == KING)?3:1;
-        return color*value;
+        int colorValue = (color == WHITE)?1:-1;
+        int gradeValue = (grade == KING)?3:1;
+        return (this == EMPTY )?0:colorValue*gradeValue;
     }
 }

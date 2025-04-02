@@ -19,6 +19,7 @@ public class DraughtGameTest {
     String thirdScenario = "4,4,WP;5,3,BK;0,0,BP";
     String fourthScenario = "3,5,WP;2,4,BP;2,2,BP";
     String fifthScenario =  "1,1,WP;3,1,BP";
+    String sixthScenario =  "1,1,WP;2,2,WK;3,3,WK;4,4,BP;5,5,BP;6,6,BP;7,7,BK;0,0,BK;3,1,BK;5,3,BK";
 
     @Test
     void testMoveNonExistingPiece(){
@@ -104,6 +105,14 @@ public class DraughtGameTest {
         draughtGame.movePiece("1,1;2,0",COLOR.WHITE);
         assertEquals("Black turn",view.message);
         assertEquals(Arrays.deepToString(createGrid("2,0,WK;3,1,BP")),Arrays.deepToString(view.grid) ,"La griglia non è come dovrebbe essere");
+    }
+
+    @Test
+    void testValuatingChessboard(){
+        DraughtGame draughtGame = new DraughtGame(view);
+        draughtGame.start();
+        draughtGame.getChessboard().setGrid(createGrid(sixthScenario));
+        assertEquals(-8,draughtGame.getChessboard().getVal());
     }
 
 

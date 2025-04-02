@@ -55,7 +55,7 @@ public class DraughtGame {
             return;
         }
 
-        updateChessboard(path);
+        chessboard.applyMove(path);
         draughtView.on_chessboard_update(chessboard.getGrid());
 
         turn = (turn==COLOR.WHITE)?COLOR.BLACK:COLOR.WHITE;
@@ -72,21 +72,6 @@ public class DraughtGame {
         else
             m = (game_end) ? "Black win" : "White turn";
         return m;
-    }
-
-    private void updateChessboard(Move move) {
-        move.getPositionCapturedPieces().forEach(p->chessboard.setSquare(p,PIECE.EMPTY));
-        chessboard.setSquare(move.getCellVisited().get(0),PIECE.EMPTY);
-        Position var = move.getLastVisited();
-        PIECE movedPiece = move.getPiece();
-        if(var.getY()==0 && movedPiece == PIECE.WHITE_PAWN){
-            chessboard.setSquare(var,PIECE.WHITE_KING);
-        } else if (var.getY() == 8 && movedPiece == PIECE.BLACK_PAWN){
-
-            chessboard.setSquare(var,PIECE.BLACK_KING);
-        }else {
-            chessboard.setSquare(var,movedPiece);
-        }
     }
 
     private String checkMoveCorrect(ArrayList<Position> positions, COLOR player, String move) {
