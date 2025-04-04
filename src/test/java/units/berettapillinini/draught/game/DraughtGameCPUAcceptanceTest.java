@@ -62,9 +62,8 @@ public class DraughtGameCPUAcceptanceTest {
         return this;
     }
 
-    private DraughtGameCPUAcceptanceTest verifyChessboard(PIECE[][] setup) {
+    private void verifyChessboard(PIECE[][] setup) {
         assertEquals(Arrays.deepToString(setup), Arrays.deepToString(view.grid), "La griglia non è come dovrebbe essere");
-        return this;
     }
 
     private DraughtGameCPUAcceptanceTest startGame() {
