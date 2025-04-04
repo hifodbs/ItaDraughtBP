@@ -23,9 +23,6 @@ public class DraughtGameCPUAcceptanceTest {
     String whiteWinScenario = "3,1,BK;5,1,WP;3,3,WP;5,3,WK;0,4,BP;2,4,WP;1,5,BK;3,5,BP";
     // MOVES = 15-11, 6x15; 14-11, 21x14 (or15x6); 7-3, 15x6 (or 14x7); 3x26.
 
-
-    // CPU can't go further than 7 moves
-
     @Test
     void testWhiteWin() {
         startGame().verifyChessboard(new Chessboard().getGrid());
