@@ -4,7 +4,6 @@ import units.berettapillinini.draught.bean.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.*;
 
@@ -33,22 +32,16 @@ public class DraughtGame {
 
     public void movePiece(String move, COLOR player) {
         ArrayList<Position> positionOfPiece = new ArrayList<>();
-        String message =checkMoveCorrect(positionOfPiece,player,move);
+        String message = checkMoveCorrect(positionOfPiece,player,move);
         if(!message.isEmpty()){
             draughtView.on_next_turn(message);
             return;
         }
 
-        ArrayList<Move> paths = new ArrayList<>();
-        for(Position pos : chessboard.getPositionColorPieces(player)) {
-            PIECE p =  chessboard.getCell(pos);
-            paths.addAll(checkPossiblePath(new Move(pos,p), getCatchablePiece(p),chessboard));
-        }
-        paths = getLegalMove(paths);
+        ArrayList<Move> moves = getMoves(player);
 
-        Move path = paths.stream().filter(p->p.getCellVisited().equals(positionOfPiece))
+        Move path = moves.stream().filter(p->p.getCellVisited().equals(positionOfPiece))
                 .findFirst().orElse(null);
-
 
         if(path == null){
             draughtView.on_next_turn("Can't move here");
@@ -64,8 +57,23 @@ public class DraughtGame {
         draughtView.on_next_turn(message);
     }
 
+    private ArrayList<Move> getMoves(COLOR player) {
+        ArrayList<Move> moves = new ArrayList<>();
+        for(Position pos : chessboard.getPositionColorPieces(player)) {
+            PIECE p =  chessboard.getCell(pos);
+            moves.addAll(getAllPossibleMove(new Move(pos,p), getCatchablePiece(p),chessboard));
+        }
+        moves = getLegalMove(moves);
+        return moves;
+    }
+
     private String getMessageEndTurn(COLOR player) {
-        boolean game_end = chessboard.getPositionColorPieces((player ==COLOR.WHITE)?COLOR.BLACK:COLOR.WHITE).isEmpty();
+        boolean game_end = false;
+        if(chessboard.getPositionColorPieces((player ==COLOR.WHITE)?COLOR.BLACK:COLOR.WHITE).isEmpty()){
+            game_end = true;
+        }else if(getMoves((player ==COLOR.WHITE)?COLOR.BLACK:COLOR.WHITE).isEmpty()){
+            game_end =true;
+        }
         String m;
         if(player == COLOR.WHITE)
             m = (game_end) ? "White win" : "Black turn";
@@ -119,9 +127,9 @@ public class DraughtGame {
             if(paths.size()==1)
                 return paths;
 
-            int firstEncoutner = paths.stream().mapToInt(Move::getFirstKingEncounter
+            int firstEncounter = paths.stream().mapToInt(Move::getFirstKingEncounter
                     ).filter(i -> i>=0).min().orElse(-1);
-            paths = paths.stream().filter(move ->(move.getFirstKingEncounter()==firstEncoutner)||firstEncoutner==-1)
+            paths = paths.stream().filter(move ->(move.getFirstKingEncounter()==firstEncounter)||firstEncounter==-1)
                     .collect(Collectors.toCollection(ArrayList::new));
         }
         return paths;
@@ -140,7 +148,7 @@ public class DraughtGame {
         return p.getY() >= 0 && p.getY() < 8;
     }
 
-    private ArrayList<Move> checkPossiblePath(Move possibleMove, EnumSet<PIECE> catchablePieces, Chessboard currentChessboard) {
+    private ArrayList<Move> getAllPossibleMove(Move possibleMove, EnumSet<PIECE> catchablePieces, Chessboard currentChessboard) {
         ArrayList<Move> moves = new ArrayList<>();
 
         Set<Position> possiblePosition = possibleMove.getPiece().getMoveList().stream()
@@ -158,7 +166,7 @@ public class DraughtGame {
                 furtherChessboard.setSquare(possibleMove.getLastVisited(),PIECE.EMPTY);
                 furtherChessboard.setSquare(Position.add(pp,possibleMove.getLastVisited()),PIECE.EMPTY);
                 furtherChessboard.setSquare(furtherMove.getLastVisited(),furtherMove.getPiece());
-                ArrayList<Move> bar = checkPossiblePath(furtherMove, catchablePieces,furtherChessboard);
+                ArrayList<Move> bar = getAllPossibleMove(furtherMove, catchablePieces,furtherChessboard);
                 moves.addAll(bar);
             }
             return moves;

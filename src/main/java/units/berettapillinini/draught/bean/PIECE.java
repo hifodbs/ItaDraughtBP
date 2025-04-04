@@ -6,19 +6,17 @@ import static units.berettapillinini.draught.bean.GRADE.*;
 import static units.berettapillinini.draught.bean.COLOR.*;
 
 public enum PIECE {
-    WHITE_PAWN("WP",WHITE, PAWN),
-    WHITE_KING("WK", WHITE, KING),
-    BLACK_PAWN("BP", BLACK, PAWN),
-    BLACK_KING("BK", BLACK, KING),
-    EMPTY("EM",null,null);
+    WHITE_PAWN(WHITE, PAWN),
+    WHITE_KING( WHITE, KING),
+    BLACK_PAWN( BLACK, PAWN),
+    BLACK_KING( BLACK, KING),
+    EMPTY(null,null);
 
-    private String type;
-    private COLOR color;
-    private GRADE grade;
-    private ArrayList<Position> moveList;
+    private final COLOR color;
+    private final GRADE grade;
+    private final ArrayList<Position> moveList;
 
-    PIECE(String type, COLOR color, GRADE grade) {
-        this.type = type;
+    PIECE( COLOR color, GRADE grade) {
         this.color = color;
         this.grade = grade;
         moveList = new ArrayList<>();
@@ -43,10 +41,6 @@ public enum PIECE {
             moveList.add(new Position(1,-1));
             moveList.add(new Position(-1,-1));
         }
-    }
-
-    public String getType() {
-        return type;
     }
 
     public COLOR getColor() {

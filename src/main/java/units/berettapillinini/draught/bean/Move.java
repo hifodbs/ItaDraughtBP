@@ -1,9 +1,6 @@
 package units.berettapillinini.draught.bean;
 
-import units.berettapillinini.draught.Chessboard;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.stream.IntStream;
 
 public class Move {
@@ -12,18 +9,6 @@ public class Move {
     ArrayList<Position> positionCapturedPieces;
     ArrayList<PIECE> capturedPieces;
     PIECE piece;
-
-    public Move(Position move, Position positionCapturedPiece, PIECE capturedPiece, PIECE piece){
-        cellVisited = new ArrayList<>();
-        positionCapturedPieces = new ArrayList<>();
-        capturedPieces = new ArrayList<>();
-
-        cellVisited.add(move);
-        positionCapturedPieces.add(positionCapturedPiece);
-        this.piece = piece;
-        capturedPieces.add(capturedPiece);
-    }
-    
 
     public Move(ArrayList<Position> cellVisited, ArrayList<Position> positionCapturedPieces, ArrayList<PIECE> capturedPieces, PIECE piece) {
         this.cellVisited = cellVisited;
@@ -61,13 +46,9 @@ public class Move {
         return cellVisited.get(cellVisited.size()-1);
     }
 
-    public Position getFirstPlace() {
-        return  cellVisited.get(0);
-    }
-
     public Move makeCopy() {
-        return new Move((ArrayList<Position>) getCellVisited().clone(), (ArrayList<Position>) getPositionCapturedPieces().clone(),
-        (ArrayList<PIECE>) getCapturedPieces().clone(),getPiece());
+        return new Move(new ArrayList<>(getCellVisited()),new ArrayList<>(getPositionCapturedPieces()),
+        new ArrayList<>(getCapturedPieces()),getPiece());
     }
 
     public void addJump(Position newCellVisited, Position positionCapturedPiece, PIECE capturedPiece) {
@@ -92,10 +73,10 @@ public class Move {
     }
 
     public String encode() {
-        String move = "";
+        StringBuilder move = new StringBuilder();
         for(Position p : cellVisited)
-            move += ";"+p.getX()+","+p.getY();
-        move = move.substring(1);
-        return move;
+            move.append(";").append(p.getX()).append(",").append(p.getY());
+        move = new StringBuilder(move.substring(1));
+        return move.toString();
     }
 }

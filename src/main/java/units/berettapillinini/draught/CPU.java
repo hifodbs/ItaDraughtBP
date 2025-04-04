@@ -23,8 +23,7 @@ public class CPU{
 
 
     public String getBestMove(){
-        int bestVal =  minMax(depth, chessboard,color,Integer.MIN_VALUE,Integer.MAX_VALUE);
-        System.out.println("Best val found : "+ bestVal);
+        minMax(depth, chessboard,color,Integer.MIN_VALUE,Integer.MAX_VALUE);
         return move.encode();
     }
 
@@ -32,86 +31,83 @@ public class CPU{
         if(depth==0)
             return chessboard.getVal();
 
-        ArrayList<Move> moves = new ArrayList<>();
-        for(Position pos : chessboard.getPositionColorPieces(color)) {
-            PIECE p =  chessboard.getCell(pos);
-            moves.addAll(checkPossiblePath(new Move(pos,p ), getCatchablePiece(p),chessboard));
-        }
-        moves = getLegalMove(moves);
+        ArrayList<Move> moves = getMoves(chessboard, color);
 
         if(moves.isEmpty())
             return (color==COLOR.WHITE)?Integer.MIN_VALUE:Integer.MAX_VALUE;
 
-        if(color==COLOR.WHITE){
-            int maxEval = Integer.MIN_VALUE;
-            int eval;
-            Chessboard furtherChessboard;
-            for(Move move :moves){
-                furtherChessboard = chessboard.makeCopy();
-                furtherChessboard.applyMove(move);
-                eval = minMax(depth-1,furtherChessboard,COLOR.BLACK,alpha,beta);
-                if(eval>maxEval){
-                    maxEval = eval;
-                    this.move = move;
+        int minMaxEval = (color==COLOR.WHITE)?Integer.MIN_VALUE:Integer.MAX_VALUE;
+        int eval;
+        Chessboard furtherChessboard;
+        for(Move move : moves){
+            furtherChessboard = chessboard.makeCopy();
+            furtherChessboard.applyMove(move);
+            eval = minMax(depth-1,furtherChessboard,(color==COLOR.WHITE)?COLOR.BLACK:COLOR.WHITE,alpha,beta);
+            if(color==COLOR.WHITE){
+                if(eval>minMaxEval){
+                    minMaxEval = eval;
+                    if(depth==this.depth)
+                        this.move = move;
                 }
                 alpha = Math.max(alpha,eval);
-                if (beta <= alpha)
-                    break;
-            }
-            return maxEval;
-        }else {
-            int minEval = Integer.MAX_VALUE;
-            int eval;
-            Chessboard furtherChessboard;
-            for(Move move :moves){
-                furtherChessboard = chessboard.makeCopy();
-                furtherChessboard.applyMove(move);
-                eval = minMax(depth-1,furtherChessboard,COLOR.WHITE,alpha,beta);
-                if(eval<minEval){
-                    minEval = eval;
-                    this.move = move;
+            }else{
+                if(eval<minMaxEval){
+                    minMaxEval = eval;
+                    if(depth==this.depth)
+                        this.move = move;
                 }
                 beta = Math.min(beta,eval);
-                if (beta <= alpha)
-                    break;
             }
-            return minEval;
+            if (beta <= alpha)
+                break;
         }
+        return minMaxEval;
+
     }
 
-    private ArrayList<Move> getLegalMove(ArrayList<Move> paths) {
-        int depth = paths.stream().mapToInt(move -> move.getCapturedPieces().size()).max().orElse(0);
+    private ArrayList<Move> getMoves(Chessboard chessboard, COLOR color) {
+        ArrayList<Move> moves = new ArrayList<>();
+        for(Position pos : chessboard.getPositionColorPieces(color)) {
+            PIECE p =  chessboard.getCell(pos);
+            moves.addAll(getAllPossibleMoves(new Move(pos,p ), getCatchablePiece(p), chessboard));
+        }
+        moves = getLegalMove(moves);
+        return moves;
+    }
+
+    private ArrayList<Move> getLegalMove(ArrayList<Move> moves) {
+        int depth = moves.stream().mapToInt(move -> move.getCapturedPieces().size()).max().orElse(0);
         if(depth != 0)
         {
-            paths = paths.stream().filter(move -> move.getCapturedPieces().size()==depth)
+            moves = moves.stream().filter(move -> move.getCapturedPieces().size()==depth)
                     .collect(Collectors.toCollection(ArrayList::new));
 
-            if(paths.size()==1)
-                return paths;
+            if(moves.size()==1)
+                return moves;
 
-            if(paths.stream().noneMatch(move -> move.getPiece().getGrade()==GRADE.KING)){
-                return paths;
+            if(moves.stream().noneMatch(move -> move.getPiece().getGrade()==GRADE.KING)){
+                return moves;
             }
 
-            paths = paths.stream().filter(move -> move.getPiece().getGrade()==GRADE.KING)
+            moves = moves.stream().filter(move -> move.getPiece().getGrade()==GRADE.KING)
                     .collect(Collectors.toCollection(ArrayList::new));
 
-            if(paths.size()==1)
-                return paths;
+            if(moves.size()==1)
+                return moves;
 
-            int nKing = paths.stream().mapToInt(Move::getNumberOfKing).max().orElse(0);
-            paths = paths.stream().filter(move -> move.getNumberOfKing()==nKing)
+            int nKing = moves.stream().mapToInt(Move::getNumberOfKing).max().orElse(0);
+            moves = moves.stream().filter(move -> move.getNumberOfKing()==nKing)
                     .collect(Collectors.toCollection(ArrayList::new));
 
-            if(paths.size()==1)
-                return paths;
+            if(moves.size()==1)
+                return moves;
 
-            int firstEncoutner = paths.stream().mapToInt(Move::getFirstKingEncounter
+            int firstEncoutner = moves.stream().mapToInt(Move::getFirstKingEncounter
             ).filter(i -> i>=0).min().orElse(-1);
-            paths = paths.stream().filter(move ->(move.getFirstKingEncounter()==firstEncoutner)||firstEncoutner==-1)
+            moves = moves.stream().filter(move ->(move.getFirstKingEncounter()==firstEncoutner)||firstEncoutner==-1)
                     .collect(Collectors.toCollection(ArrayList::new));
         }
-        return paths;
+        return moves;
     }
 
 
@@ -127,7 +123,7 @@ public class CPU{
         return p.getY() >= 0 && p.getY() < 8;
     }
 
-    private ArrayList<Move> checkPossiblePath(Move possibleMove, EnumSet<PIECE> catchablePieces, Chessboard currentChessboard) {
+    private ArrayList<Move> getAllPossibleMoves(Move possibleMove, EnumSet<PIECE> catchablePieces, Chessboard currentChessboard) {
         ArrayList<Move> moves = new ArrayList<>();
 
         Set<Position> possiblePosition = possibleMove.getPiece().getMoveList().stream()
@@ -145,7 +141,7 @@ public class CPU{
                 furtherChessboard.setSquare(possibleMove.getLastVisited(),PIECE.EMPTY);
                 furtherChessboard.setSquare(Position.add(pp,possibleMove.getLastVisited()),PIECE.EMPTY);
                 furtherChessboard.setSquare(furtherMove.getLastVisited(),furtherMove.getPiece());
-                ArrayList<Move> bar = checkPossiblePath(furtherMove, catchablePieces,furtherChessboard);
+                ArrayList<Move> bar = getAllPossibleMoves(furtherMove, catchablePieces,furtherChessboard);
                 moves.addAll(bar);
             }
             return moves;
