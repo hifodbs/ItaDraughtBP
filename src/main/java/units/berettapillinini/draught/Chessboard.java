@@ -21,9 +21,9 @@ public class Chessboard{
     private void initGrid() {
         for(int a = 0; a < SIZE_GRID;a++)
             for(int b = 0; b < SIZE_GRID;b++) {
-                if(a<3 && (a+b)%2==0)
+                if(a<3 && (a+b)%2==1)
                     gridSquare[a][b] = PIECE.BLACK_PAWN;
-                else if (a>4 && (a+b)%2==0)
+                else if (a>4 && (a+b)%2==1)
                     gridSquare[a][b] = PIECE.WHITE_PAWN;
                 else
                     gridSquare[a][b] = PIECE.EMPTY;
@@ -75,7 +75,7 @@ public class Chessboard{
         move.getPositionCapturedPieces().forEach(position -> setSquare(position,PIECE.EMPTY));
         if(pos.getY()==0 && piece == PIECE.WHITE_PAWN){
             setSquare(pos,PIECE.WHITE_KING);
-        } else if (pos.getY() == 8 && piece == PIECE.BLACK_PAWN){
+        } else if (pos.getY() == 7 && piece == PIECE.BLACK_PAWN){
 
             setSquare(pos,PIECE.BLACK_KING);
         }else {
