@@ -10,11 +10,16 @@ public class DraughtController {
     private final DraughtView view;
     private final ArrayList<Position> selectedPositions = new ArrayList<>();
     private final boolean vsCPU;
+    private CPU cpu;
 
     public DraughtController(DraughtView view, boolean vsCPU) {
         this.view = view;
         this.vsCPU = vsCPU;
         this.game = new DraughtGame(view, vsCPU);
+
+        if(vsCPU){
+            cpu = new CPU(COLOR.BLACK, 5, game.getChessboard());
+        }
     }
 
     public void startGame() {
@@ -22,6 +27,11 @@ public class DraughtController {
     }
 
     public void handleCellClick(int x, int y) {
+        if(vsCPU && game.getTurn() == COLOR.BLACK) {
+            view.on_next_turn("Wait for the CPU");
+            return;
+        }
+
         Position clicked = new Position(x, y);
 
         if (selectedPositions.isEmpty()) {
@@ -62,6 +72,8 @@ public class DraughtController {
             PIECE startPiece = game.getChessboard().getCell(selectedPositions.getFirst());
             if (game.getTurn() != startPiece.getColor()) {
                 selectedPositions.clear();
+            }if(vsCPU && game.getTurn() == COLOR.BLACK){
+              doCPUMove();
             } else {
                 selectedPositions.clear();
                 selectedPositions.add(clicked);
@@ -80,6 +92,17 @@ public class DraughtController {
             if (i < positions.size() - 1) builder.append(";");
         }
         return builder.toString();
+    }
+
+    private void doCPUMove() {
+        String cpuMove = cpu.getBestMove();
+        if(cpuMove != null && !cpuMove.isEmpty()){
+            game.movePiece(cpuMove, COLOR.BLACK);
+            view.on_next_turn("CPU has moved: " + cpuMove);
+            if (game.getTurn() == COLOR.BLACK){
+                doCPUMove();
+            }
+        }
     }
 
     public DraughtGame getGame(){return game;}
