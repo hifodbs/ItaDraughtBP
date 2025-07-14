@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static units.berettapillinini.draught.game.util.TestUtil.createGrid;
 
 
-public class DraughtGameAcceptanceTest {
+class DraughtGameAcceptanceTest {
 
     private FakeView view;
     private DraughtGame game;
@@ -54,7 +54,7 @@ public class DraughtGameAcceptanceTest {
 
     private DraughtGameAcceptanceTest startGame() {
         view = new FakeView();
-        game = new DraughtGame(view);
+        game = new DraughtGame(view, false);
         game.start();
         return this;
     }

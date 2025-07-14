@@ -24,7 +24,7 @@ public class DraughtGameTest {
 
     @Test
     void testMoveNonExistingPiece(){
-        DraughtGame draughtGame = new DraughtGame(view);
+        DraughtGame draughtGame = new DraughtGame(view, false);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(firstScenario));
         draughtGame.movePiece("7,7;6,6",COLOR.WHITE);
@@ -33,7 +33,7 @@ public class DraughtGameTest {
 
     @Test
     void testMoveOpponentPiece(){
-        DraughtGame draughtGame = new DraughtGame(view);
+        DraughtGame draughtGame = new DraughtGame(view, false);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(firstScenario));
         draughtGame.movePiece("0,0;1,1", COLOR.WHITE);
@@ -42,7 +42,7 @@ public class DraughtGameTest {
 
     @Test
     void testAnomalousMove(){
-        DraughtGame draughtGame = new DraughtGame(view);
+        DraughtGame draughtGame = new DraughtGame(view, false);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(firstScenario));
         draughtGame.movePiece("3,5;3,4",COLOR.WHITE);
@@ -51,7 +51,7 @@ public class DraughtGameTest {
 
     @Test
     void testAvoidCapture(){
-        DraughtGame draughtGame = new DraughtGame(view);
+        DraughtGame draughtGame = new DraughtGame(view, false);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(secondScenario));
         draughtGame.movePiece("4,4;3,3",COLOR.WHITE);
@@ -60,7 +60,7 @@ public class DraughtGameTest {
 
     @Test
     void testCapturingKingWithPawn(){
-        DraughtGame draughtGame = new DraughtGame(view);
+        DraughtGame draughtGame = new DraughtGame(view, false);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(thirdScenario));
         draughtGame.movePiece("4,4;6,2",COLOR.WHITE);
@@ -69,7 +69,7 @@ public class DraughtGameTest {
 
     @Test
     void testGoingOutOfBound(){
-        DraughtGame draughtGame = new DraughtGame(view);
+        DraughtGame draughtGame = new DraughtGame(view, false);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(secondScenario));
         draughtGame.movePiece("4,4;6,2",COLOR.WHITE);
@@ -80,7 +80,7 @@ public class DraughtGameTest {
 
     @Test
     void testWhiteMakeDoubleMoves(){
-        DraughtGame draughtGame = new DraughtGame(view);
+        DraughtGame draughtGame = new DraughtGame(view, false);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(firstScenario));
         draughtGame.movePiece("3,5;2,4",COLOR.WHITE);
@@ -91,7 +91,7 @@ public class DraughtGameTest {
 
     @Test
     void testCapturingTwoPieces(){
-        DraughtGame draughtGame = new DraughtGame(view);
+        DraughtGame draughtGame = new DraughtGame(view, false);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(fourthScenario));
         draughtGame.movePiece("3,5;1,3;3,1",COLOR.WHITE);
@@ -100,7 +100,7 @@ public class DraughtGameTest {
 
     @Test
     void testPromotingPiece(){
-        DraughtGame draughtGame = new DraughtGame(view);
+        DraughtGame draughtGame = new DraughtGame(view, false);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(fifthScenario));
         draughtGame.movePiece("1,1;2,0",COLOR.WHITE);
@@ -110,7 +110,7 @@ public class DraughtGameTest {
 
     @Test
     void testValuatingChessboard(){
-        DraughtGame draughtGame = new DraughtGame(view);
+        DraughtGame draughtGame = new DraughtGame(view, false);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(sixthScenario));
         assertEquals(-8,draughtGame.getChessboard().getVal());
@@ -118,7 +118,7 @@ public class DraughtGameTest {
 
     @Test
     void testWhiteWinForNonLegalMoveForBlack(){
-        DraughtGame draughtGame = new DraughtGame(view);
+        DraughtGame draughtGame = new DraughtGame(view, false);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(seventhScenario));
         draughtGame.movePiece("7,3;6,2",COLOR.WHITE);

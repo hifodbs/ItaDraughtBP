@@ -65,7 +65,7 @@ public class DraughtGameCPUAcceptanceTest {
 
     private DraughtGameCPUAcceptanceTest startGame() {
         view = new FakeView();
-        game = new DraughtGame(view);
+        game = new DraughtGame(view, true);
         cpu = new CPU(COLOR.WHITE, 13, game.getChessboard());
         game.start();
         return this;

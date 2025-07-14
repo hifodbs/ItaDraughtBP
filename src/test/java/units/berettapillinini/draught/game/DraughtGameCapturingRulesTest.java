@@ -24,7 +24,7 @@ public class DraughtGameCapturingRulesTest {
 
     @Test
     void testCapturingPawnInsteadOfKing(){
-        DraughtGame draughtGame = new DraughtGame(view);
+        DraughtGame draughtGame = new DraughtGame(view, false);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(firstScenario));
         draughtGame.movePiece("2,4;0,2", COLOR.WHITE);
@@ -33,7 +33,7 @@ public class DraughtGameCapturingRulesTest {
 
     @Test
     void testCapturingTwoPiecesInsteadOfThree(){
-        DraughtGame draughtGame = new DraughtGame(view);
+        DraughtGame draughtGame = new DraughtGame(view, false);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(secondScenario));
         draughtGame.movePiece("1,7;3,5;5,3",COLOR.WHITE);
@@ -42,7 +42,7 @@ public class DraughtGameCapturingRulesTest {
 
     @Test
     void testCapturingWithPawnInsteadOfKing(){
-        DraughtGame draughtGame = new DraughtGame(view);
+        DraughtGame draughtGame = new DraughtGame(view, false);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(thirdScenario));
         draughtGame.movePiece("4,6;2,4;4,2",COLOR.WHITE);
@@ -53,7 +53,7 @@ public class DraughtGameCapturingRulesTest {
 
     @Test
     void testCapturingOneKingInsteadTwoKing(){
-        DraughtGame draughtGame = new DraughtGame(view);
+        DraughtGame draughtGame = new DraughtGame(view, false);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(fourthScenario));
         draughtGame.movePiece("0,4;2,2;0,0",COLOR.WHITE);
@@ -65,7 +65,7 @@ public class DraughtGameCapturingRulesTest {
 
     @Test
     void testCapturingSamePieceButWrongOrder(){
-        DraughtGame draughtGame = new DraughtGame(view);
+        DraughtGame draughtGame = new DraughtGame(view, false);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(fifthScenario));
         draughtGame.movePiece("0,4;2,2;0,0",COLOR.WHITE);
@@ -77,7 +77,7 @@ public class DraughtGameCapturingRulesTest {
 
     @Test
     void testCapturingKingInsteadOfTwoPawn(){
-        DraughtGame draughtGame = new DraughtGame(view);
+        DraughtGame draughtGame = new DraughtGame(view, false);
         draughtGame.start();
         draughtGame.getChessboard().setGrid(createGrid(sixthScenario));
         draughtGame.movePiece("7,3;5,1",COLOR.WHITE);
