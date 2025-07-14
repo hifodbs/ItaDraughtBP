@@ -125,7 +125,5 @@ public class DraughtGUI extends JFrame implements DraughtView {
         // non necessario, ma richiesto dall’interfaccia
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(DraughtGUI::new);
-    }
+
 }
