@@ -117,12 +117,12 @@ public class DraughtConsoleUI implements DraughtView {
     }
 
     private void doCPUMove() {
-        String cpuMove = cpu.getBestMove();  // prendi la mossa migliore della CPU
+        String cpuMove = cpu.getBestMove();
         if (cpuMove != null && !cpuMove.isEmpty()) {
-            game.movePiece(cpuMove, COLOR.BLACK);  // fai muovere la CPU (supponendo che giochi nero)
+            game.movePiece(cpuMove, COLOR.BLACK);
             on_next_turn("CPU has moved: " + cpuMove);
 
-            // Se dopo la mossa è ancora il turno della CPU, fai un'altra mossa (es. multi salto)
+
             if (game.getTurn() == COLOR.BLACK) {
                 doCPUMove();
             }
