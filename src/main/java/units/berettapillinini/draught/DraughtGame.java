@@ -15,7 +15,9 @@ public class DraughtGame {
 
     private COLOR turn;
 
-    public DraughtGame(DraughtView draughtView){
+    public COLOR getTurn() { return turn; }
+
+    public DraughtGame(DraughtView draughtView, boolean vsCPU){
         chessboard = new Chessboard();
         this.draughtView = draughtView;
     }
@@ -24,6 +26,7 @@ public class DraughtGame {
         draughtView.on_chessboard_update(chessboard.getGrid());
         draughtView.on_next_turn("White turn");
         turn = COLOR.WHITE;
+        draughtView.run();
     }
 
     public Chessboard getChessboard() {
@@ -57,7 +60,7 @@ public class DraughtGame {
         draughtView.on_next_turn(message);
     }
 
-    private ArrayList<Move> getMoves(COLOR player) {
+    public ArrayList<Move> getMoves(COLOR player) {
         ArrayList<Move> moves = new ArrayList<>();
         for(Position pos : chessboard.getPositionColorPieces(player)) {
             PIECE p =  chessboard.getCell(pos);
@@ -89,11 +92,11 @@ public class DraughtGame {
         Arrays.stream(move.split(";")).forEach(str->positions
                 .add(new Position(Integer.parseInt(str.split(",")[0]),Integer.parseInt(str.split(",")[1]))));
 
-        if(chessboard.getCell(positions.get(0)) == PIECE.EMPTY) {
+        if(chessboard.getCell(positions.getFirst()) == PIECE.EMPTY) {
             return "No existing piece";
         }
 
-        if(player != chessboard.getCell(positions.get(0)).getColor()){
+        if(player != chessboard.getCell(positions.getFirst()).getColor()){
             return "Can't move opponent piece";
         }
 
