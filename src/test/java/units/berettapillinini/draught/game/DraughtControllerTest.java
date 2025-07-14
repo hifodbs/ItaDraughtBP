@@ -16,7 +16,7 @@ class DraughtControllerTest {
     @BeforeEach
     public void setup() {
         testView = new FakeView();
-        controller = new DraughtController(testView, false); // partita 1vs1 senza CPU
+        controller = new DraughtController(testView, false);
         controller.startGame();
     }
     @Test
