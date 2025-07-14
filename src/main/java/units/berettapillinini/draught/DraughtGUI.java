@@ -122,7 +122,7 @@ public class DraughtGUI extends JFrame implements DraughtView {
 
     @Override
     public void run() {
-        // non necessario, ma richiesto dall’interfaccia
+
     }
 
 
