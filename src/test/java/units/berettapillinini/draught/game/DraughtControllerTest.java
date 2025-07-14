@@ -25,31 +25,29 @@ class DraughtControllerTest {
         DraughtController controller = new DraughtController(view, false);
         controller.startGame();
 
-        controller.handleCellClick(2, 5); // seleziona pedina bianca
-        controller.handleCellClick(3, 4); // mossa
+        controller.handleCellClick(2, 5);
+        controller.handleCellClick(3, 4);
 
         assertNotNull(view.grid);
         assertEquals("Black turn", view.message);
     }
     @Test
     void testBoardChangesAfterMove() {
-        // Ottieni la board iniziale (copia profonda)
         PIECE[][] boardBefore = copyBoard(controller.getGame().getChessboard().getGrid());
 
-        // Simula una mossa: clicca su una pedina bianca e sulla posizione di destinazione
-        // Esempio: supponiamo che (2, 3) sia una pedina bianca e (3, 4) una mossa legale
-        controller.handleCellClick(2, 3); // seleziona pedina
-        controller.handleCellClick(3, 4); // muovi pedina
 
-        // Ottieni la board dopo la mossa
+        controller.handleCellClick(2, 3);
+        controller.handleCellClick(3, 4);
+
+
         Chessboard boardAfter = controller.getGame().getChessboard();
 
-        // Verifica che la board sia cambiata (non uguale a prima)
-        assertTrue(boardsAreEqual(boardBefore, boardAfter.getGrid()), "La scacchiera dovrebbe cambiare dopo la mossa");
 
-        // Eventualmente verifica che la posizione di partenza sia ora vuota
+        assertTrue(boardsAreEqual(boardBefore, boardAfter.getGrid()), "Chessboard should change after the move");
+
+
         assertNotSame(PIECE.EMPTY, boardAfter.getGrid());
-        // Nota: verifica la logica del gioco, aggiusta le coordinate secondo necessità
+
     }
 
     private PIECE[][] copyBoard(PIECE[][] original) {
