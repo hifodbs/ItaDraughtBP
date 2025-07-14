@@ -53,6 +53,11 @@ public class FakeView implements DraughtView {
     }
 
     @Override
+    public void run() {
+
+    }
+
+    @Override
     public void on_next_turn(String m) {
         message = m;
     }

@@ -10,4 +10,6 @@ public interface DraughtView{
 
     void on_close();
 
+    void run();
+
 }
