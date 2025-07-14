@@ -18,8 +18,8 @@ public class Main {
             } else if ("console".equals(mode)) {
                 DraughtConsoleUI ui = new DraughtConsoleUI();
                 boolean vsCPU = DraughtConsoleUI.askGameMode();
-                DraughtGame game = new DraughtGame(ui, vsCPU);
-                game.start();
+                ui.startGame(vsCPU);
+                ui.run();
                 break;
             } else {
                 System.out.println("Unknown command: choose GUI or console");

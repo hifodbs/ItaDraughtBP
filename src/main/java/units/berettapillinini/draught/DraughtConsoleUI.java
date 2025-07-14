@@ -6,8 +6,10 @@ import java.util.Scanner;
 
 public class DraughtConsoleUI implements DraughtView {
 
-    private final DraughtGame game;
+    private DraughtGame game;
     private String lastMessage = "";
+    private boolean vsCPU;
+    private CPU cpu;
 
     @Override
     public void on_next_turn(String message) {
@@ -20,7 +22,13 @@ public class DraughtConsoleUI implements DraughtView {
     }
 
     public DraughtConsoleUI() {
-        game = new DraughtGame(this, false);
+    }
+
+    public void startGame(boolean vsCPU){
+        this.vsCPU = vsCPU;
+        game = new DraughtGame(this, vsCPU);
+        cpu = new CPU(COLOR.BLACK, 5, game.getChessboard());
+        game.start();
     }
 
     public static boolean askGameMode() {
@@ -43,11 +51,16 @@ public class DraughtConsoleUI implements DraughtView {
     }
 
 
+
     public void run() {
 
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
+            if(vsCPU && game.getTurn() == COLOR.BLACK) {
+                doCPUMove();
+                continue;
+            }
             System.out.print("Enter move (format: x1,y1;x2,y2;...): ");
             String move = scanner.nextLine();
             if (move.equals("exit")) {
@@ -100,8 +113,21 @@ public class DraughtConsoleUI implements DraughtView {
         if (!isInTestEnvironment()) {
             System.exit(0);
         }
+
     }
 
+    private void doCPUMove() {
+        String cpuMove = cpu.getBestMove();  // prendi la mossa migliore della CPU
+        if (cpuMove != null && !cpuMove.isEmpty()) {
+            game.movePiece(cpuMove, COLOR.BLACK);  // fai muovere la CPU (supponendo che giochi nero)
+            on_next_turn("CPU has moved: " + cpuMove);
+
+            // Se dopo la mossa è ancora il turno della CPU, fai un'altra mossa (es. multi salto)
+            if (game.getTurn() == COLOR.BLACK) {
+                doCPUMove();
+            }
+        }
+    }
 
     private boolean isInTestEnvironment() {
         return System.getProperty("TEST_ENV") != null;
