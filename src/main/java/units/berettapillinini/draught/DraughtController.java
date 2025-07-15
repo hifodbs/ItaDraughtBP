@@ -26,6 +26,13 @@ public class DraughtController {
         game.start();
     }
 
+    public void initCPU(int difficulty) {
+        if (vsCPU) {
+            cpu = new CPU(COLOR.BLACK, difficulty, game.getChessboard());
+        }
+    }
+
+
     public void handleCellClick(int x, int y) {
         if (vsCPU && game.getTurn() == COLOR.BLACK) {
             view.on_next_turn("Wait for the CPU");

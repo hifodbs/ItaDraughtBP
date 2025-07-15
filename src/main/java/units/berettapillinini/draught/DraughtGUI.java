@@ -56,7 +56,13 @@ public class DraughtGUI extends JFrame implements DraughtView {
         toFront();
         requestFocus();
 
-        controller = new DraughtController(this, vsCPU);
+        if (vsCPU) {
+            int difficulty = askDifficultyLevelGUI();
+            controller = new DraughtController(this, true);
+            controller.initCPU(difficulty);
+        } else {
+            controller = new DraughtController(this, false);
+        }
         controller.startGame();
     }
 
@@ -118,6 +124,33 @@ public class DraughtGUI extends JFrame implements DraughtView {
         java.net.URL url = getClass().getResource(path);
         assert url != null;
         return resizeIcon(new ImageIcon(url));
+    }
+
+    public int askDifficultyLevelGUI() {
+        while (true) {
+            String input = JOptionPane.showInputDialog(
+                    this,
+                    "Choose difficulty level (1 - Easy, 5 - Hard):",
+                    "Select CPU Difficulty",
+                    JOptionPane.QUESTION_MESSAGE
+            );
+
+            if (input == null) {
+                JOptionPane.showMessageDialog(this, "Game cancelled.");
+                System.exit(0);
+            }
+
+            try {
+                int level = Integer.parseInt(input.trim());
+                if (level >= 1 && level <= 5) {
+                    return level;
+                } else {
+                    JOptionPane.showMessageDialog(this, "Please enter a number between 1 and 5.");
+                }
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Invalid input. Please enter a number between 1 and 5.");
+            }
+        }
     }
 
     @Override

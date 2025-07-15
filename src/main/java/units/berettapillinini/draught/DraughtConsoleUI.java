@@ -27,7 +27,11 @@ public class DraughtConsoleUI implements DraughtView {
     public void startGame(boolean vsCPU){
         this.vsCPU = vsCPU;
         game = new DraughtGame(this, vsCPU);
-        cpu = new CPU(COLOR.BLACK, 5, game.getChessboard());
+
+        if(vsCPU){
+            int difficulty = askDifficultyLevelConsole();
+            cpu = new CPU(COLOR.BLACK, difficulty, game.getChessboard());
+        }
         game.start();
     }
 
@@ -49,6 +53,24 @@ public class DraughtConsoleUI implements DraughtView {
             }
         }
     }
+
+    private int askDifficultyLevelConsole() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Choose difficulty level (1 - Easy, 5 - Hard): ");
+        while (true) {
+            try {
+                int level = Integer.parseInt(scanner.nextLine().trim());
+                if (level >= 1 && level <= 5) {
+                    return level;
+                } else {
+                    System.out.print("Invalid input. Please enter a number between 1 and 5: ");
+                }
+            } catch (NumberFormatException e) {
+                System.out.print("Invalid input. Please enter a number between 1 and 5: ");
+            }
+        }
+    }
+
 
 
 
