@@ -123,9 +123,7 @@ public class DraughtConsoleUI implements DraughtView {
             on_next_turn("CPU has moved: " + cpuMove);
 
 
-            if (game.getTurn() == COLOR.BLACK) {
-                doCPUMove();
-            }
+
         }
     }
 
