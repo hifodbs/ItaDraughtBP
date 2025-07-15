@@ -20,6 +20,12 @@ public class DraughtGUI extends JFrame implements DraughtView {
     public DraughtGUI() {
         super("Dama");
 
+        try {
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         showGameModeDialog();
 
         whitePawnIcon = loadIcon("/images/white_pawn.png");
