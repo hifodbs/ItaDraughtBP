@@ -17,7 +17,7 @@ public class DraughtController {
         this.vsCPU = vsCPU;
         this.game = new DraughtGame(view, vsCPU);
 
-        if(vsCPU){
+        if (vsCPU) {
             cpu = new CPU(COLOR.BLACK, 5, game.getChessboard());
         }
     }
@@ -27,7 +27,7 @@ public class DraughtController {
     }
 
     public void handleCellClick(int x, int y) {
-        if(vsCPU && game.getTurn() == COLOR.BLACK) {
+        if (vsCPU && game.getTurn() == COLOR.BLACK) {
             view.on_next_turn("Wait for the CPU");
             return;
         }
@@ -69,16 +69,26 @@ public class DraughtController {
             String moveStr = buildMoveString(selectedPositions);
             game.movePiece(moveStr, game.getTurn());
 
-            PIECE startPiece = game.getChessboard().getCell(selectedPositions.getFirst());
-            if (game.getTurn() != startPiece.getColor()) {
-                selectedPositions.clear();
-            }if(vsCPU && game.getTurn() == COLOR.BLACK){
-              doCPUMove();
-            } else {
-                selectedPositions.clear();
+
+            selectedPositions.clear();
+
+            if (vsCPU && game.getTurn() == COLOR.BLACK) {
+                doCPUMove();
+                return;
+            }
+
+            ArrayList<Move> newMoves = game.getMoves(game.getTurn());
+            boolean hasFurtherJumps = newMoves.stream().anyMatch(m ->
+                    m.getCellVisited().getFirst().equals(clicked) && m.getCellVisited().size() > 1
+            );
+
+            if (hasFurtherJumps) {
                 selectedPositions.add(clicked);
                 view.on_next_turn("Keep jumping with: " + clicked.getX() + "," + clicked.getY());
+            } else {
+                view.on_next_turn(game.getTurn() == COLOR.WHITE ? "White turn" : "Black turn");
             }
+
         } else {
             view.on_next_turn("Select another square to complete the move");
         }
@@ -96,14 +106,16 @@ public class DraughtController {
 
     private void doCPUMove() {
         String cpuMove = cpu.getBestMove();
-        if(cpuMove != null && !cpuMove.isEmpty()){
+        if (cpuMove != null && !cpuMove.isEmpty()) {
             game.movePiece(cpuMove, COLOR.BLACK);
             view.on_next_turn("CPU has moved: " + cpuMove);
-            if (game.getTurn() == COLOR.BLACK){
+            if (game.getTurn() == COLOR.BLACK) {
                 doCPUMove();
             }
         }
     }
 
-    public DraughtGame getGame(){return game;}
+    public DraughtGame getGame() {
+        return game;
+    }
 }

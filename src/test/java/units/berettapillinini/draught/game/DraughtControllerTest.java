@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import units.berettapillinini.draught.Chessboard;
 import units.berettapillinini.draught.DraughtController;
+import units.berettapillinini.draught.bean.COLOR;
 import units.berettapillinini.draught.bean.PIECE;
 import units.berettapillinini.draught.game.util.FakeView;
 
@@ -19,6 +20,7 @@ class DraughtControllerTest {
         controller = new DraughtController(testView, false);
         controller.startGame();
     }
+
     @Test
     void testValidMoveChangesTurn() {
         FakeView view = new FakeView();
@@ -28,9 +30,12 @@ class DraughtControllerTest {
         controller.handleCellClick(2, 5);
         controller.handleCellClick(3, 4);
 
+
         assertNotNull(view.grid);
-        assertEquals("Black turn", view.message);
+        assertEquals(COLOR.BLACK, controller.getGame().getTurn());
+
     }
+
     @Test
     void testBoardChangesAfterMove() {
         PIECE[][] boardBefore = copyBoard(controller.getGame().getChessboard().getGrid());
