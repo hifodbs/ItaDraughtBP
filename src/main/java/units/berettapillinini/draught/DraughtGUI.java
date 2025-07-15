@@ -65,7 +65,7 @@ public class DraughtGUI extends JFrame implements DraughtView {
         int choice = JOptionPane.showOptionDialog(
                 this,
                 "Select the game mode:",
-                "Modalità",
+                "Modality",
                 JOptionPane.DEFAULT_OPTION,
                 JOptionPane.QUESTION_MESSAGE,
                 null,
