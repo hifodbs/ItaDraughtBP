@@ -29,3 +29,7 @@ tasks.jar {
 tasks.test {
     useJUnitPlatform()
 }
+
+tasks.named<JavaExec>("run"){
+    standardInput = System.`in`
+}
