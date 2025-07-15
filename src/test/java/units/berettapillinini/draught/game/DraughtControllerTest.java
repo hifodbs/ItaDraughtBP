@@ -12,11 +12,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class DraughtControllerTest {
     private DraughtController controller;
-    private FakeView testView;
 
     @BeforeEach
-    public void setup() {
-        testView = new FakeView();
+    void setup() {
+        FakeView testView = new FakeView();
         controller = new DraughtController(testView, false);
         controller.startGame();
     }
