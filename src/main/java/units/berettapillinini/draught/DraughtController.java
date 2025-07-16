@@ -110,7 +110,7 @@ public class DraughtController {
 
         ArrayList<Move> newMoves = game.getMoves(game.getTurn());
         boolean hasFurtherJumps = newMoves.stream().anyMatch(m ->
-                m.getCellVisited().getFirst().equals(clicked) && m.getCellVisited().size() > 1
+                m.getCellVisited().get(0).equals(clicked) && m.getCellVisited().size() > 1
         );
 
         if (hasFurtherJumps) {
