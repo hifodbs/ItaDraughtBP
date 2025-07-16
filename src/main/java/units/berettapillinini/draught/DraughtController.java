@@ -34,13 +34,30 @@ public class DraughtController {
 
 
     public void handleCellClick(int x, int y) {
-        if (vsCPU && game.getTurn() == COLOR.BLACK) {
-            view.on_next_turn("Wait for the CPU");
-            return;
-        }
+        if (shouldWaitForCPU()) return;
 
         Position clicked = new Position(x, y);
 
+        if (isFirstSelection(clicked)) return;
+
+        if (!isPartialMoveValid(clicked)) return;
+
+        if (isExactMove()) {
+            performMove(clicked);
+        } else {
+            view.on_next_turn("Select another square to complete the move");
+        }
+    }
+
+    private boolean shouldWaitForCPU() {
+        if (vsCPU && game.getTurn() == COLOR.BLACK) {
+            view.on_next_turn("Wait for the CPU");
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isFirstSelection(Position clicked) {
         if (selectedPositions.isEmpty()) {
             PIECE clickedPiece = game.getChessboard().getCell(clicked);
             if (clickedPiece != PIECE.EMPTY && clickedPiece.getColor() == game.getTurn()) {
@@ -49,9 +66,12 @@ public class DraughtController {
             } else {
                 view.on_next_turn("Select one of your pieces");
             }
-            return;
+            return true;
         }
+        return false;
+    }
 
+    private boolean isPartialMoveValid(Position clicked) {
         selectedPositions.add(clicked);
         ArrayList<Move> moves = game.getMoves(game.getTurn());
 
@@ -67,39 +87,41 @@ public class DraughtController {
         if (!partialMatch) {
             view.on_next_turn("Invalid move, select a piece");
             selectedPositions.clear();
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean isExactMove() {
+        return game.getMoves(game.getTurn()).stream()
+                .anyMatch(m -> m.getCellVisited().equals(selectedPositions));
+    }
+
+    private void performMove(Position clicked) {
+        String moveStr = buildMoveString(selectedPositions);
+        game.movePiece(moveStr, game.getTurn());
+        selectedPositions.clear();
+
+        if (vsCPU && game.getTurn() == COLOR.BLACK) {
+            doCPUMove();
             return;
         }
 
-        boolean exactMatch = moves.stream().anyMatch(m -> m.getCellVisited().equals(selectedPositions));
+        ArrayList<Move> newMoves = game.getMoves(game.getTurn());
+        boolean hasFurtherJumps = newMoves.stream().anyMatch(m ->
+                m.getCellVisited().getFirst().equals(clicked) && m.getCellVisited().size() > 1
+        );
 
-        if (exactMatch) {
-            String moveStr = buildMoveString(selectedPositions);
-            game.movePiece(moveStr, game.getTurn());
-
-
-            selectedPositions.clear();
-
-            if (vsCPU && game.getTurn() == COLOR.BLACK) {
-                doCPUMove();
-                return;
-            }
-
-            ArrayList<Move> newMoves = game.getMoves(game.getTurn());
-            boolean hasFurtherJumps = newMoves.stream().anyMatch(m ->
-                    m.getCellVisited().get(0).equals(clicked) && m.getCellVisited().size() > 1
-            );
-
-            if (hasFurtherJumps) {
-                selectedPositions.add(clicked);
-                view.on_next_turn("Keep jumping with: " + clicked.getX() + "," + clicked.getY());
-            } else {
-                view.on_next_turn(game.getTurn() == COLOR.WHITE ? "White turn" : "Black turn");
-            }
-
+        if (hasFurtherJumps) {
+            selectedPositions.add(clicked);
+            view.on_next_turn("Keep jumping with: " + clicked.getX() + "," + clicked.getY());
         } else {
-            view.on_next_turn("Select another square to complete the move");
+            view.on_next_turn(game.getTurn() == COLOR.WHITE ? "White turn" : "Black turn");
         }
     }
+
+
 
     private String buildMoveString(ArrayList<Position> positions) {
         StringBuilder builder = new StringBuilder();
@@ -116,9 +138,6 @@ public class DraughtController {
         if (cpuMove != null && !cpuMove.isEmpty()) {
             game.movePiece(cpuMove, COLOR.BLACK);
             view.on_next_turn("CPU has moved: " + cpuMove);
-            if (game.getTurn() == COLOR.BLACK) {
-                doCPUMove();
-            }
         }
     }
 
