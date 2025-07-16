@@ -14,13 +14,13 @@ public class Main {
             String mode = scanner.nextLine().trim().toLowerCase();
             if ("gui".equals(mode)) {
                 SwingUtilities.invokeLater(DraughtGUI::new);
-                break;
+                return;
             } else if ("console".equals(mode)) {
                 DraughtConsoleUI ui = new DraughtConsoleUI();
                 boolean vsCPU = DraughtConsoleUI.askGameMode();
                 ui.startGame(vsCPU);
                 ui.run();
-                break;
+                return;
             } else {
                 System.out.println("Unknown command: choose GUI or console");
             }

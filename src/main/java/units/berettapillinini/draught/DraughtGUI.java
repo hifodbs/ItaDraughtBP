@@ -59,7 +59,6 @@ public class DraughtGUI extends JFrame implements DraughtView {
         setAlwaysOnTop(true);
         setResizable(true);
         setVisible(true);
-        toFront();
         requestFocus();
 
         if (vsCPU) {
