@@ -92,11 +92,11 @@ public class DraughtGame {
         Arrays.stream(move.split(";")).forEach(str->positions
                 .add(new Position(Integer.parseInt(str.split(",")[0]),Integer.parseInt(str.split(",")[1]))));
 
-        if(chessboard.getCell(positions.getFirst()) == PIECE.EMPTY) {
+        if(chessboard.getCell(positions.get(0)) == PIECE.EMPTY) {
             return "No existing piece";
         }
 
-        if(player != chessboard.getCell(positions.getFirst()).getColor()){
+        if(player != chessboard.getCell(positions.get(0)).getColor()){
             return "Can't move opponent piece";
         }
 
