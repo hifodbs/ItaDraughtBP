@@ -22,6 +22,7 @@ public class DraughtConsoleUI implements DraughtView {
     }
 
     public DraughtConsoleUI() {
+        //Intentionally left Blank
     }
 
     public void startGame(boolean vsCPU){
