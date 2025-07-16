@@ -40,14 +40,14 @@ class DraughtControllerTest {
         PIECE[][] boardBefore = copyBoard(controller.getGame().getChessboard().getGrid());
 
 
-        controller.handleCellClick(2, 3);
+        controller.handleCellClick(2, 5);
         controller.handleCellClick(3, 4);
 
 
         Chessboard boardAfter = controller.getGame().getChessboard();
 
 
-        assertTrue(boardsAreEqual(boardBefore, boardAfter.getGrid()), "Chessboard should change after the move");
+        assertFalse(boardsAreEqual(boardBefore, boardAfter.getGrid()), "Chessboard should change after the move");
 
 
         assertNotSame(PIECE.EMPTY, boardAfter.getGrid());
