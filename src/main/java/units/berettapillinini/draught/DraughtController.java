@@ -103,6 +103,12 @@ public class DraughtController {
         game.movePiece(moveStr, game.getTurn());
         selectedPositions.clear();
 
+        COLOR currentTurn = game.getTurn();
+        ArrayList<Move> availableMoves = game.getMoves(currentTurn);
+        if (availableMoves.isEmpty() || game.getChessboard().getPositionColorPieces(currentTurn).isEmpty()) {
+            return;
+        }
+
         if (vsCPU && game.getTurn() == COLOR.BLACK) {
             doCPUMove();
             return;
